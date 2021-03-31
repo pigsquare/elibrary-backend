@@ -1,0 +1,21 @@
+server:
+  port: 8100
+  servlet:
+    context-path: /api
+spring:
+  datasource:
+    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/elibrary?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf-8}
+    username: ${MYSQL_USERNAME:username}
+    password: ${MYSQL_PASSWORD:123456}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: mysql
+    open-in-view: true
+    show-sql: true
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: db2.elibrary.entity,db2.elibrary.dto
+jwt:
+  expiration: 1800
+  secret: ${JWT_SECRET:1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ}
