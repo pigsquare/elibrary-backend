@@ -13,6 +13,10 @@ spring:
     database: mysql
     open-in-view: true
     show-sql: true
+  mail:
+    host: smtp.ym.163.com
+    username: no-reply@squarepig.cn
+    password: ${MAIL_PASSWORD:123456}
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: db2.elibrary.entity,db2.elibrary.dto
