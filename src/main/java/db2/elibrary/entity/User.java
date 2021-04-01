@@ -3,9 +3,11 @@ package db2.elibrary.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import db2.elibrary.entity.enums.RoleEnum;
 import lombok.Data;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -17,7 +19,11 @@ import java.util.List;
 @Entity
 public class User implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
     private String id;
 
     @NotNull
@@ -34,6 +40,14 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RoleEnum role = RoleEnum.ROLE_READER;
+
+    private String name;
+
+    @Email
+    private String email;
+
+    @Pattern(regexp = "^[1][3-9][0-9]{9}$")
+    private String tel;
 
     private boolean enabled;
 
@@ -59,5 +73,10 @@ public class User implements UserDetails {
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
+    }
+
+    public void setUnencodedPassword(String password){
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        this.password = encoder.encode(password);
     }
 }
