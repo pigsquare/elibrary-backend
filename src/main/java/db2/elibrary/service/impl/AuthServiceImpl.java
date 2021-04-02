@@ -35,7 +35,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthTokenResponseDto Login(AuthTokenRequestDto requestDto) throws AuthException {
+    public AuthTokenResponseDto login(AuthTokenRequestDto requestDto) throws AuthException {
         log.info(requestDto.toString());
         UsernamePasswordAuthenticationToken upToken=new UsernamePasswordAuthenticationToken(requestDto.getUsername(),requestDto.getPassword());
         try {
@@ -71,5 +71,10 @@ public class AuthServiceImpl implements AuthService {
         log.info(user.toString());
         userRepository.save(user);
         return user;
+    }
+
+    @Override
+    public Boolean registerByEmail() {
+        return null;
     }
 }

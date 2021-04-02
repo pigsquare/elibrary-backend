@@ -21,6 +21,6 @@ public class AuthRestController {
     @PostMapping("/login")
     public AuthTokenResponseDto login(@RequestBody @Valid AuthTokenRequestDto requestDto){
         log.info("login");
-        return authService.Login(requestDto);
+        return authService.login(requestDto);
     }
 }

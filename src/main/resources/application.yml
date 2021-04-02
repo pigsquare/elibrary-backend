@@ -23,3 +23,7 @@ mybatis:
 jwt:
   expiration: 1800
   secret: ${JWT_SECRET:1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ}
+tencent:
+  secret-id: ${TX_SECRETID:11111111}
+  secret-key: ${TX_SECRETKEY:2efwegwe}
+  appid: ${TX_APPID:123456}

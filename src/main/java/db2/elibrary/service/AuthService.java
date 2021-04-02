@@ -7,6 +7,7 @@ import db2.elibrary.entity.User;
 import db2.elibrary.exception.AuthException;
 
 public interface AuthService {
-    AuthTokenResponseDto Login(AuthTokenRequestDto requestDto) throws AuthException;
+    AuthTokenResponseDto login(AuthTokenRequestDto requestDto) throws AuthException;
     User TestRegister(AddUserTestDto addUserTestDto) throws AuthException;
+    Boolean registerByEmail();
 }
