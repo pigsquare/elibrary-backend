@@ -47,6 +47,7 @@ public class User implements UserDetails {
     private String email;
 
     @Pattern(regexp = "^[1][3-9][0-9]{9}$")
+    @Column(unique = true)
     private String tel;
 
     private boolean enabled;

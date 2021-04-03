@@ -106,6 +106,31 @@
             <artifactId>tencentcloud-sdk-java</artifactId>
             <version>3.1.57</version>
         </dependency>
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-easysdk</artifactId>
+            <version>2.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.13.0.ALL</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alipay.sdkdemo</groupId>
+            <artifactId>alipay-sdk-java-demo</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/alipay-trade-sdk-20161215.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.alipay.sdkdemo.source</groupId>
+            <artifactId>alipay-sdk-java-demo-src</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/alipay-trade-sdk-20161215-source.jar</systemPath>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -120,6 +145,7 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                    <includeSystemScope>true</includeSystemScope>
                 </configuration>
             </plugin>
         </plugins>
