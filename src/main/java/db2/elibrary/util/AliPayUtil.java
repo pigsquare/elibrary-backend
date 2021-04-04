@@ -4,13 +4,16 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.AlipayTradePayModel;
+import com.alipay.api.domain.AlipayTradeQueryModel;
 import com.alipay.api.request.AlipayTradePayRequest;
+import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.response.AlipayTradePayResponse;
+import com.alipay.api.response.AlipayTradeQueryResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class AliPayUtil{
-    public Boolean payLateFee(Double fee, String barCode) throws AlipayApiException {
+    public String  payFee(Double fee, String barCode, String subject) throws AlipayApiException {
         AlipayClient alipayClient = new DefaultAlipayClient(
                 "https://openapi.alipaydev.com/gateway.do",
                 "2021000119644643",
@@ -22,21 +25,47 @@ public class AliPayUtil{
         AlipayTradePayRequest request = new AlipayTradePayRequest();
         AlipayTradePayModel model = new AlipayTradePayModel();
         request.setBizModel(model);
+        AlipayTradeQueryRequest queryRequest = new AlipayTradeQueryRequest();
+        AlipayTradeQueryModel queryModel = new AlipayTradeQueryModel();
+        queryRequest.setBizModel(queryModel);
+        String outTradeNo = System.currentTimeMillis()+"";
 
-        model.setOutTradeNo(System.currentTimeMillis()+"");
-        model.setSubject("缴纳滞纳金"+fee+"元");
-        model.setTotalAmount(fee.toString());
+        model.setOutTradeNo(outTradeNo);
+        model.setSubject(subject);
+        model.setTotalAmount("0"+new java.text.DecimalFormat("#.00").format(fee));
         model.setAuthCode(barCode);//沙箱钱包中的付款码
         model.setScene("bar_code");
+        model.setTimeoutExpress("1m");
 
         AlipayTradePayResponse response = null;
         try {
             response = alipayClient.execute(request);
             System.out.println(response.getBody());
+            String resultCode = response.getCode();
+            int times=0;
+            while (resultCode.equals("10003")&&times<=12){
+                times++;
+                log.info("交易进行中，5s后第"+times+"次查询。。。");
+                Thread.sleep(5000);
+                queryModel.setOutTradeNo(outTradeNo);
+                queryModel.setTradeNo(response.getTradeNo());
+                AlipayTradeQueryResponse queryResponse = alipayClient.execute(queryRequest);
+                if(queryResponse.getCode().equals("10000")){
+                    log.info(queryResponse.getTradeStatus());
+                    if(queryResponse.getTradeStatus().equals("TRADE_SUCCESS")||queryResponse.getTradeStatus().equals("TRADE_FINISHED"))
+                        resultCode = queryResponse.getCode();
+                    if(queryResponse.getTradeStatus().equals("TRADE_CLOSED")){
+                        resultCode = "40004";
+                    }
+                }
+
+            }
             System.out.println(response.getTradeNo());
-        } catch (AlipayApiException e) {
+            if(resultCode.equals("10000"))
+                return response.getTradeNo();
+        } catch (AlipayApiException | InterruptedException e) {
             e.printStackTrace();
         }
-        return false;
+        return null;
     }
 }

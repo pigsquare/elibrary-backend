@@ -35,15 +35,16 @@ public class TestRestController{
         return smsService.sendReservationSuccessSms("","《计算机体系结构》","3月28日",7,"4月10日");
     }
     @RequestMapping("/alipay/{barcode}")
-    public String testAlipay(@PathVariable String barcode) throws AlipayApiException {
+    public String testAlipay(@PathVariable String barcode, @RequestParam String fee) throws AlipayApiException {
         AliPayUtil aliPayUtil = new AliPayUtil();
-        Boolean res = true;
+        String  res = "";
+        Double p = Double.parseDouble(fee);
         try {
-            res = aliPayUtil.payLateFee(1.39,barcode);
+            res = aliPayUtil.payFee(p,barcode,"test");
         }catch (AlipayApiException e){
             e.printStackTrace();
         }
-        return res.toString();
+        return res;
     }
 
 }
