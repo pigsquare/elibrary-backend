@@ -2,11 +2,8 @@ package db2.elibrary.entity;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.sql.Date;
+import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Entity
 @Data
@@ -16,5 +13,6 @@ public class PendingRegisterUser {
     private Long id;
 
     private String phone;
-    private Date registerTime;
+    private String code;
+    private Timestamp registerTime;
 }
