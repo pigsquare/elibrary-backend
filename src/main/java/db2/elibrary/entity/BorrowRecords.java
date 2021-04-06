@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 public class BorrowRecords {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private Integer id;
 
     @ManyToOne
     private User user;
