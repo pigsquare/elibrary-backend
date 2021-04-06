@@ -51,6 +51,13 @@ public class User implements UserDetails {
 
     private boolean enabled = true;
 
+    private Double balance = 0.0;
+
+    private Integer credit = 100;
+
+    @ManyToOne
+    private Grade grade;
+
     @Override
     @JsonIgnore
     @Transient

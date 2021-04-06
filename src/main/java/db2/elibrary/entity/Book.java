@@ -2,10 +2,7 @@ package db2.elibrary.entity;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Data
 @Entity
@@ -24,6 +21,6 @@ public class Book {
     private String classifyCode;
     private String indexNo;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User admin;
 }
