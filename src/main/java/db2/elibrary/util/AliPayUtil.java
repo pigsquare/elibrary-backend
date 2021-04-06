@@ -3,10 +3,13 @@ package db2.elibrary.util;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.domain.AlipayTradeCancelModel;
 import com.alipay.api.domain.AlipayTradePayModel;
 import com.alipay.api.domain.AlipayTradeQueryModel;
+import com.alipay.api.request.AlipayTradeCancelRequest;
 import com.alipay.api.request.AlipayTradePayRequest;
 import com.alipay.api.request.AlipayTradeQueryRequest;
+import com.alipay.api.response.AlipayTradeCancelResponse;
 import com.alipay.api.response.AlipayTradePayResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +48,17 @@ public class AliPayUtil{
             int times=0;
             while (resultCode.equals("10003")&&times<=12){
                 times++;
+                if(times>=13){
+                    log.info("交易失败，关闭交易。。。");
+                    AlipayTradeCancelModel cancelModel = new AlipayTradeCancelModel();
+                    cancelModel.setOutTradeNo(outTradeNo);
+                    cancelModel.setTradeNo(response.getTradeNo());
+                    AlipayTradeCancelRequest cancelRequest = new AlipayTradeCancelRequest();
+                    cancelRequest.setBizModel(cancelModel);
+                    AlipayTradeCancelResponse cancelResponse = alipayClient.execute(cancelRequest);
+                    log.info(cancelResponse.getMsg());
+                    resultCode = "40004";
+                }
                 log.info("交易进行中，5s后第"+times+"次查询。。。");
                 Thread.sleep(5000);
                 queryModel.setOutTradeNo(outTradeNo);
