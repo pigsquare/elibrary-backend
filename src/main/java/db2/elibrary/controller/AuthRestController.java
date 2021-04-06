@@ -1,9 +1,6 @@
 package db2.elibrary.controller;
 
-import db2.elibrary.dto.AuthTokenRequestDto;
-import db2.elibrary.dto.AuthTokenResponseDto;
-import db2.elibrary.dto.RegisterByTelDto;
-import db2.elibrary.dto.ValidateByTelRequestDto;
+import db2.elibrary.dto.*;
 import db2.elibrary.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +29,11 @@ public class AuthRestController {
         return authService.login(requestDto);
     }
     @PostMapping("/register/tel")
-    public String registerByTel(@Valid @RequestBody RegisterByTelDto dto){
+    public CommonResponseDto registerByTel(@Valid @RequestBody RegisterByTelDto dto){
         dto.addPrefix();
-        return authService.registerByTel(dto.getTel());
+        CommonResponseDto responseDto = new CommonResponseDto();
+        responseDto.setMessage(authService.registerByTel(dto.getTel()));
+        return responseDto;
     }
     @PostMapping("/validate/tel")
     public AuthTokenResponseDto validateTel(@Valid @RequestBody ValidateByTelRequestDto dto){
