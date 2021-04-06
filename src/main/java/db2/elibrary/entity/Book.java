@@ -1,11 +1,11 @@
 package db2.elibrary.entity;
 
 import lombok.Data;
-import org.springframework.data.annotation.Reference;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @Data
 @Entity
@@ -17,12 +17,13 @@ public class Book {
     private String publisher;
     private String publishDate;
     private Double price;
-    
+
     @Column(length = 1024)
     private String description;
     private String keywords;
     private String classifyCode;
     private String indexNo;
 
-    private String adminId;
+    @ManyToOne
+    private User admin;
 }

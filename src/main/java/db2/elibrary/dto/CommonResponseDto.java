@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class CommonResponseDto {
-    private Integer code;
+    private Integer code = 200;
     private String message;
     private Object args;
 }
