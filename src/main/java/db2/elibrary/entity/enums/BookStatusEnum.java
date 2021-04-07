@@ -1,6 +1,6 @@
 package db2.elibrary.entity.enums;
 
-public enum  StatusEnum {
+public enum  BookStatusEnum {
     AVAILABLE,      // 可借
     BORROWED,       // 已借出
     BOOKED,         // 已借出，并被预定

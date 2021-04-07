@@ -1,6 +1,6 @@
 package db2.elibrary.entity;
 
-import db2.elibrary.entity.enums.StatusEnum;
+import db2.elibrary.entity.enums.BookStatusEnum;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -16,7 +16,7 @@ public class Holding {
     private Book book;
 
     @Enumerated(EnumType.STRING)
-    private StatusEnum status;
+    private BookStatusEnum status;
     private String barcode;
 
     @ManyToOne

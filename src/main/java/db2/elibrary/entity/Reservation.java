@@ -1,5 +1,6 @@
 package db2.elibrary.entity;
 
+import db2.elibrary.entity.enums.ReserveStatusEnum;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -24,6 +25,9 @@ public class Reservation {
     private Date lastDate;
 
     private Boolean complete;
+
+    @Enumerated(EnumType.STRING)
+    private ReserveStatusEnum status;
 
     private String memo;
 }

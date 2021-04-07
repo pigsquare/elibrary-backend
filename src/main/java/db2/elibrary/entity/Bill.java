@@ -3,6 +3,7 @@ package db2.elibrary.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Data
 @Entity
@@ -20,5 +21,6 @@ public class Bill {
     private String code;
     private String msg;
     private String payStatus;
+    private Timestamp payTime;
 
 }
