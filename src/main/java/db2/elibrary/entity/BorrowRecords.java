@@ -19,6 +19,8 @@ public class BorrowRecords {
     @ManyToOne
     private Holding book;
 
+    @ManyToOne Admin agent;
+
     private Timestamp borrowTime;
 
     private Date lastReturnDate;
@@ -26,6 +28,8 @@ public class BorrowRecords {
     private Boolean extend;
 
     private Timestamp returnTime;
+
+    private Double lateFee;
 
     private String memo;
 }

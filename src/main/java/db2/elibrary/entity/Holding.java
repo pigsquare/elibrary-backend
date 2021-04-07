@@ -15,9 +15,10 @@ public class Holding {
     @ManyToOne
     private Book book;
 
+    @Enumerated(EnumType.STRING)
     private StatusEnum status;
     private String barcode;
 
     @ManyToOne
-    private User admin;
+    private Admin admin;
 }

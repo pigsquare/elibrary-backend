@@ -22,5 +22,5 @@ public class Book {
     private String indexNo;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private User admin;
+    private Admin admin;
 }
