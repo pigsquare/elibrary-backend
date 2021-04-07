@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 
 @Data
 @Entity
-public class BorrowRecords {
+public class BorrowRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
