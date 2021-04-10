@@ -7,8 +7,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SmsServiceImpl implements SmsService {
+    private SmsUtil smsUtil;
+
     @Autowired
-    SmsUtil smsUtil;
+    public SmsServiceImpl(SmsUtil smsUtil) {
+        this.smsUtil = smsUtil;
+    }
+
     @Override
     public String sendVerifySms(String phone, String code) {
         smsUtil.setPhoneNumberSet1(new String[]{phone});
