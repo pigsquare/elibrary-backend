@@ -7,7 +7,9 @@ import db2.elibrary.service.AuthService;
 import db2.elibrary.service.MailService;
 import db2.elibrary.service.SmsService;
 import db2.elibrary.util.AliPayUtil;
+import db2.elibrary.util.crawler.HttpUtilDownPage;
 import org.checkerframework.checker.units.qual.A;
+import org.htmlcleaner.XPatherException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +27,8 @@ public class TestRestController{
     private MailService mailService;
     @Autowired
     private JavaMailSender mailSender;
+    @Autowired
+    private HttpUtilDownPage httpUtilDownPage;
     @PostMapping("/adduser")
     public User AddUser(@Valid @RequestBody AddUserTestDto addUserTestDto){
         return authService.TestRegister(addUserTestDto);
@@ -45,6 +49,11 @@ public class TestRestController{
             e.printStackTrace();
         }
         return res;
+    }
+    @RequestMapping("/book/info/{isbn}")
+    public String getBookInfo(@PathVariable String isbn) throws XPatherException {
+        httpUtilDownPage.parseBookInfo(isbn);
+        return "2333";
     }
 
 }

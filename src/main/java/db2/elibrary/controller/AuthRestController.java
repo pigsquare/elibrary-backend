@@ -1,6 +1,7 @@
 package db2.elibrary.controller;
 
 import db2.elibrary.dto.*;
+import db2.elibrary.exception.AuthException;
 import db2.elibrary.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +37,11 @@ public class AuthRestController {
         return responseDto;
     }
     @PostMapping("/validate/tel")
-    public AuthTokenResponseDto validateTel(@Valid @RequestBody ValidateByTelRequestDto dto){
+    public AuthTokenResponseDto validateTel(@Valid @RequestBody ValidateByTelRequestDto dto)throws AuthException {
         dto.addPrefix();
         if(authService.validateTel(dto.getPrefixTel(),dto.getCode(),dto.getPassword())){
             return authService.registerByTelSuccess(dto);
         }
-        return null;
+        else throw new AuthException("验证码不正确");
     }
 }
