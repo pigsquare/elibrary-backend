@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -75,8 +77,31 @@ public class HttpUtilDownPage {
                 // TODO: 获取出版商信息、出版日期、定价
                 for (Object obj: objArr){
                     TagNode tagNode1 = (TagNode)obj;
-                    String publisher = removeWhiteLabels(tagNode1.getText().toString());
-                    log.info("publisher: "+publisher);
+                    String rawStr = removeWhiteLabels(tagNode1.getText().toString());
+                    String pattern = "出版社:\\s*(\\S+)\\s";
+                    Pattern r = Pattern.compile(pattern);
+                    Matcher m = r.matcher(rawStr);
+                    if(m.find()){
+                        String publisher = m.group(1);
+                        log.info("publisher: "+ publisher);
+                    }
+                    pattern = "出版年:\\s*(\\S+)\\s*";
+                    r = Pattern.compile(pattern);
+                    m = r.matcher(rawStr);
+                    if(m.find()){
+                        String publish_date = m.group(1);
+                        log.info("publish_date: "+ publish_date);
+                    }
+                    pattern = "定价:\\s*(\\S+)\\s*";
+                    r = Pattern.compile(pattern);
+                    m = r.matcher(rawStr);
+                    if(m.find()){
+                        String priceStr = m.group(1);
+                        if(priceStr.contains("元"))
+                            priceStr=priceStr.substring(0,priceStr.length()-1);
+                        Double price = Double.parseDouble(priceStr);
+                        log.info("price: "+ price);
+                    }
                 }
             }
             objArr = tagNode.evaluateXPath(xpath4);
