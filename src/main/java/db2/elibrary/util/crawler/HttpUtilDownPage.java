@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 public class HttpUtilDownPage {
     private static final WebClient webClient = new WebClient(BrowserVersion.CHROME);
 
-    private static String sendGet(String url){
+    private static String sendGet(String url) {
         // js出错不抛出异常
         webClient.getOptions().setThrowExceptionOnScriptError(false);
         // HTTP！=200不抛出异常
@@ -30,8 +30,8 @@ public class HttpUtilDownPage {
         webClient.getOptions().setJavaScriptEnabled(false);
         webClient.setAjaxController(new NicelyResynchronizingAjaxController());
         HtmlPage htmlPage = null;
-        try{
-            htmlPage=webClient.getPage(url);
+        try {
+            htmlPage = webClient.getPage(url);
         } catch (MalformedURLException e) {
             log.error("MalformedURLException");
         } catch (IOException e) {
@@ -39,7 +39,7 @@ public class HttpUtilDownPage {
         }
 
         // webClient.waitForBackgroundJavaScript(10000);视情况是否需要异步执行脚本
-        if (htmlPage!=null){
+        if (htmlPage != null) {
             return htmlPage.asXml();
         }
         return null;
@@ -47,8 +47,8 @@ public class HttpUtilDownPage {
     }
 
     public void parseBookInfo(String isbn) throws XPatherException {
-        String contents = HttpUtilDownPage.sendGet("https://book.douban.com/isbn/"+isbn);
-        if(contents!=null&&!contents.isEmpty()){
+        String contents = HttpUtilDownPage.sendGet("https://book.douban.com/isbn/" + isbn);
+        if (contents != null && !contents.isEmpty()) {
             HtmlCleaner htmlCleaner = new HtmlCleaner();
             TagNode tagNode = htmlCleaner.clean(contents);
             String xpath1 = "/body/div[3]/h1/span";
@@ -57,67 +57,57 @@ public class HttpUtilDownPage {
             String xpath4 = "/body/div[3]/div[2]/div/div[1]/div[3]/div[1]/div[1]/div/p";
             String xpath5 = "/body/div[3]/div[2]/div/div[1]/div[3]/div[7]/div/span";
             var objArr = tagNode.evaluateXPath(xpath1);
-            if(objArr!=null&&objArr.length>0){
-                for (Object obj: objArr){
-                    TagNode tagNode1 = (TagNode)obj;
+            if (objArr != null && objArr.length > 0) {
+                for (Object obj : objArr) {
+                    TagNode tagNode1 = (TagNode) obj;
                     String bookName = removeWhiteLabels(tagNode1.getText().toString());
-                    log.info("book name: "+bookName);
+                    log.info("book name: " + bookName);
                 }
             }
             objArr = tagNode.evaluateXPath(xpath2);
-            if(objArr!=null&&objArr.length>0){
-                for (Object obj: objArr){
-                    TagNode tagNode1 = (TagNode)obj;
+            if (objArr != null && objArr.length > 0) {
+                for (Object obj : objArr) {
+                    TagNode tagNode1 = (TagNode) obj;
                     String author = removeWhiteLabels(tagNode1.getText().toString());
-                    log.info("author: "+author);
+                    log.info("author: " + author);
                 }
             }
             objArr = tagNode.evaluateXPath(xpath3);
-            if(objArr!=null&&objArr.length>0){
+            if (objArr != null && objArr.length > 0) {
                 // TODO: 获取出版商信息、出版日期、定价
-                for (Object obj: objArr){
-                    TagNode tagNode1 = (TagNode)obj;
+                for (Object obj : objArr) {
+                    TagNode tagNode1 = (TagNode) obj;
                     String rawStr = removeWhiteLabels(tagNode1.getText().toString());
-                    String pattern = "出版社:\\s*(\\S+)\\s";
-                    Pattern r = Pattern.compile(pattern);
+                    String pattern = "出版社:\\s*(\\S+).*出版年:\\s*(\\S+).*定价:\\s*(\\S+)";
+                    Pattern r = Pattern.compile(pattern, Pattern.DOTALL);
                     Matcher m = r.matcher(rawStr);
-                    if(m.find()){
+                    if (m.find()) {
                         String publisher = m.group(1);
-                        log.info("publisher: "+ publisher);
-                    }
-                    pattern = "出版年:\\s*(\\S+)\\s*";
-                    r = Pattern.compile(pattern);
-                    m = r.matcher(rawStr);
-                    if(m.find()){
-                        String publish_date = m.group(1);
-                        log.info("publish_date: "+ publish_date);
-                    }
-                    pattern = "定价:\\s*(\\S+)\\s*";
-                    r = Pattern.compile(pattern);
-                    m = r.matcher(rawStr);
-                    if(m.find()){
-                        String priceStr = m.group(1);
-                        if(priceStr.contains("元"))
-                            priceStr=priceStr.substring(0,priceStr.length()-1);
+                        log.info("publisher: " + publisher);
+                        String publish_date = m.group(2);
+                        log.info("publish_date: " + publish_date);
+                        String priceStr = m.group(3);
+                        if (priceStr.contains("元"))
+                            priceStr = priceStr.substring(0, priceStr.length() - 1);
                         Double price = Double.parseDouble(priceStr);
-                        log.info("price: "+ price);
+                        log.info("price: " + price);
                     }
                 }
             }
             objArr = tagNode.evaluateXPath(xpath4);
-            if(objArr!=null&&objArr.length>0){
-                for (Object obj: objArr){
-                    TagNode tagNode1 = (TagNode)obj;
+            if (objArr != null && objArr.length > 0) {
+                for (Object obj : objArr) {
+                    TagNode tagNode1 = (TagNode) obj;
                     String bookDescription = removeWhiteLabels(tagNode1.getText().toString());
-                    log.info("book description: "+bookDescription);
+                    log.info("book description: " + bookDescription);
                 }
             }
             objArr = tagNode.evaluateXPath(xpath5);
-            if(objArr!=null&&objArr.length>0){
-                for (Object obj: objArr){
-                    TagNode tagNode1 = (TagNode)obj;
+            if (objArr != null && objArr.length > 0) {
+                for (Object obj : objArr) {
+                    TagNode tagNode1 = (TagNode) obj;
                     String keywords = removeWhiteLabels(tagNode1.getText().toString());
-                    log.info("keywords: "+keywords);
+                    log.info("keywords: " + keywords);
                 }
             }
 
@@ -126,30 +116,30 @@ public class HttpUtilDownPage {
 
     }
 
-    private String removeWhiteLabels(String s){
+    private String removeWhiteLabels(String s) {
         int l = s.length();
         int begin = 0;
-        int end = l-1;
-        for(int i=0;i<l;i++){
-            if(s.charAt(i)!='\n'&&s.charAt(i)!='\r'
-                    &&s.charAt(i)!='\t'&&s.charAt(i)!=' '){
-                begin=i;
+        int end = l - 1;
+        for (int i = 0; i < l; i++) {
+            if (s.charAt(i) != '\n' && s.charAt(i) != '\r'
+                    && s.charAt(i) != '\t' && s.charAt(i) != ' ') {
+                begin = i;
                 break;
             }
         }
-        for(int i=l-1;i>=0;i--){
-            if(s.charAt(i)!='\n'&&s.charAt(i)!='\r'
-                    &&s.charAt(i)!='\t'&&s.charAt(i)!=' '){
-                end=i;
+        for (int i = l - 1; i >= 0; i--) {
+            if (s.charAt(i) != '\n' && s.charAt(i) != '\r'
+                    && s.charAt(i) != '\t' && s.charAt(i) != ' ') {
+                end = i;
                 break;
             }
         }
-        if(begin>end)return "";
-        return s.substring(begin,end+1);
+        if (begin > end) return "";
+        return s.substring(begin, end + 1);
     }
 
-    private String addInfo(String s, String info){
-        if(s.length()==0)return info;
-        return s+" "+info;
+    private String addInfo(String s, String info) {
+        if (s.length() == 0) return info;
+        return s + " " + info;
     }
 }
