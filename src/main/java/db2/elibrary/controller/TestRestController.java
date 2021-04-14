@@ -2,6 +2,7 @@ package db2.elibrary.controller;
 
 import com.alipay.api.AlipayApiException;
 import db2.elibrary.dto.AddUserTestDto;
+import db2.elibrary.dto.IsbnInfoResponseDto;
 import db2.elibrary.entity.User;
 import db2.elibrary.service.AuthService;
 import db2.elibrary.service.MailService;
@@ -51,9 +52,8 @@ public class TestRestController{
         return res;
     }
     @RequestMapping("/book/info/{isbn}")
-    public String getBookInfo(@PathVariable String isbn) throws XPatherException {
-        httpUtilDownPage.parseBookInfo(isbn);
-        return "2333";
+    public IsbnInfoResponseDto getBookInfo(@PathVariable String isbn) throws XPatherException {
+        return httpUtilDownPage.parseBookInfo(isbn);
     }
 
 }

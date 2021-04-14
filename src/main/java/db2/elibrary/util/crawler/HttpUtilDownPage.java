@@ -4,6 +4,7 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import db2.elibrary.dto.IsbnInfoResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
@@ -46,7 +47,9 @@ public class HttpUtilDownPage {
 
     }
 
-    public void parseBookInfo(String isbn) throws XPatherException {
+    public IsbnInfoResponseDto parseBookInfo(String isbn) throws XPatherException {
+        IsbnInfoResponseDto responseDto = new IsbnInfoResponseDto();
+        responseDto.setIsbn(isbn);
         String contents = HttpUtilDownPage.sendGet("https://book.douban.com/isbn/" + isbn);
         if (contents != null && !contents.isEmpty()) {
             HtmlCleaner htmlCleaner = new HtmlCleaner();
@@ -54,15 +57,16 @@ public class HttpUtilDownPage {
             String xpath1 = "/body/div[3]/h1/span";
             String xpath2 = "/body/div[3]/div[2]/div/div[1]/div[1]/div[1]/div[1]/div[2]/span[1]/a";
             String xpath3 = "/body/div[3]/div[2]/div/div[1]/div[1]/div[1]/div[1]/div[2][text()[1]]";
-            String xpath4 = "/body/div[3]/div[2]/div/div[1]/div[3]/div[1]/div[1]/div/p";
-            String xpath5 = "/body/div[3]/div[2]/div/div[1]/div[3]/div[7]/div/span/a";
+            // String xpath4 = "/body/div[3]/div[2]/div/div[1]/div[3]/div[1]/div[1]/div/p";
+            // String xpath5 = "/body/div[3]/div[2]/div/div[1]/div[3]/div[7]/div/span/a";
             // 获取书名
             var objArr = tagNode.evaluateXPath(xpath1);
             if (objArr != null && objArr.length > 0) {
                 for (Object obj : objArr) {
                     TagNode tagNode1 = (TagNode) obj;
                     String bookName = removeWhiteLabels(tagNode1.getText().toString());
-                    log.info("book name: " + bookName);
+                    responseDto.setName(bookName);
+                    // log.info("book name: " + bookName);
                 }
             }
             // 获取作者
@@ -71,7 +75,8 @@ public class HttpUtilDownPage {
                 for (Object obj : objArr) {
                     TagNode tagNode1 = (TagNode) obj;
                     String author = removeWhiteLabels(tagNode1.getText().toString());
-                    log.info("author: " + author);
+                    responseDto.setAuthor(addInfo(responseDto.getAuthor(), author));
+                    // log.info("author: " + author);
                 }
             }
             // 获取出版社、出版日期、定价
@@ -85,46 +90,93 @@ public class HttpUtilDownPage {
                     Matcher m = r.matcher(rawStr);
                     if (m.find()) {
                         String publisher = m.group(1);
-                        log.info("publisher: " + publisher);
+                        responseDto.setPublisher(publisher);
+                        // log.info("publisher: " + publisher);
                         String publish_date = m.group(2);
-                        log.info("publish_date: " + publish_date);
+                        responseDto.setPublishDate(publish_date);
+                        // log.info("publish_date: " + publish_date);
                         String priceStr = m.group(3) + m.group(4);
                         // FIXED: 金额格式混乱，有纯数字、CNY 99、￥21.9、29元 等格式
                         String priceRgx = "\\d+(?:\\.\\d+)?";
                         Matcher priceMatcher = Pattern.compile(priceRgx, Pattern.MULTILINE).matcher(priceStr);
                         if(priceMatcher.find()){
                             double price = Double.parseDouble(priceMatcher.group());
-                            log.info("price: " + price);
+                            responseDto.setPrice(price);
+                            // log.info("price: " + price);
                         }
-//                        if (priceStr.contains("元"))
-//                            priceStr = priceStr.substring(0, priceStr.length() - 1);
-//                        double price = Double.parseDouble(priceStr);
-//                        log.info("price: " + price);
                     }
                 }
             }
-            // 获取描述
-            objArr = tagNode.evaluateXPath(xpath4);
-            if (objArr != null && objArr.length > 0) {
-                for (Object obj : objArr) {
-                    TagNode tagNode1 = (TagNode) obj;
-                    String bookDescription = removeWhiteLabels(tagNode1.getText().toString());
-                    log.info("book description: " + bookDescription);
-                }
-            }
-            // 获取关键词
-            objArr = tagNode.evaluateXPath(xpath5);
-            if (objArr != null && objArr.length > 0) {
-                for (Object obj : objArr) {
-                    TagNode tagNode1 = (TagNode) obj;
-                    String keywords = removeWhiteLabels(tagNode1.getText().toString());
-                    log.info("keywords: " + keywords);
-                }
-            }
+//            // 获取描述
+//            objArr = tagNode.evaluateXPath(xpath4);
+//            if (objArr != null && objArr.length > 0) {
+//                for (Object obj : objArr) {
+//                    TagNode tagNode1 = (TagNode) obj;
+//                    String bookDescription = removeWhiteLabels(tagNode1.getText().toString());
+//                    log.info("book description: " + bookDescription);
+//                }
+//            }
+//            // 获取关键词
+//            objArr = tagNode.evaluateXPath(xpath5);
+//            if (objArr != null && objArr.length > 0) {
+//                for (Object obj : objArr) {
+//                    TagNode tagNode1 = (TagNode) obj;
+//                    String keywords = removeWhiteLabels(tagNode1.getText().toString());
+//                    log.info("keywords: " + keywords);
+//                }
+//            }
 
 
         }
 
+        // data from national library of China
+        String contents1 = HttpUtilDownPage.sendGet(getNlcReqUrl(isbn));
+        if(contents1 != null && !contents1.isEmpty()){
+            HtmlCleaner htmlCleaner = new HtmlCleaner();
+            TagNode tagNode = htmlCleaner.clean(contents1);
+            String xpath1 = "/body/div[6]/table[2]/tbody/tr/td/div[3]/table/tbody/tr";
+            var objArr = tagNode.evaluateXPath(xpath1);
+            if (objArr != null && objArr.length > 0) {
+                for (Object obj : objArr) {
+                    TagNode tagNode1 = (TagNode) obj;
+                    String bookInfo = tagNode1.getText().toString().replaceAll("\\s*", "");
+                    // log.info("info from nlc: " + bookInfo);
+                    if (bookInfo.startsWith("中图分类号")){
+                        responseDto.setClassifyCode(bookInfo.replaceFirst("中图分类号",""));
+                        // log.info("中图分类号: " + bookInfo.replaceFirst("中图分类号",""));
+                    }
+                    if (bookInfo.startsWith("主题")){
+                        responseDto.setKeywords(bookInfo.replaceFirst("主题",""));
+                        // log.info("主题: " + bookInfo.replaceFirst("主题",""));
+                    }
+                    if (bookInfo.startsWith("内容提要")){
+                        responseDto.setDescription(bookInfo.replaceFirst("内容提要",""));
+                        // log.info("内容提要: " + bookInfo.replaceFirst("内容提要",""));
+                    }
+                }
+            }
+        }
+        return responseDto;
+    }
+
+    private String getNlcReqUrl(String isbn) throws XPatherException {
+        int session = Math.toIntExact(Math.round(Math.random() * 1000000000));
+        String contents = HttpUtilDownPage.sendGet("http://opac.nlc.cn/F?RN=" + session);
+        if(contents != null && !contents.isEmpty()){
+            HtmlCleaner htmlCleaner = new HtmlCleaner();
+            TagNode tagNode = htmlCleaner.clean(contents);
+            String xpath1 = "/body/div[4]/form";
+            var objArr = tagNode.evaluateXPath(xpath1);
+            if (objArr != null && objArr.length > 0) {
+                for (Object obj : objArr) {
+                    TagNode tagNode1 = (TagNode) obj;
+                    String url = tagNode1.getAttributeByName("action");
+                    log.info("url with session: " + url);
+                    return url+"?find_code=ISB&local_base=NLC01&func=find-b&request="+isbn;
+                }
+            }
+        }
+        return "";
     }
 
     private String removeWhiteLabels(String s) {
@@ -150,7 +202,7 @@ public class HttpUtilDownPage {
     }
 
     private String addInfo(String s, String info) {
-        if (s.length() == 0) return info;
+        if (s == null || s.length() == 0) return info;
         return s + " " + info;
     }
 }
