@@ -14,4 +14,6 @@ public class IsbnInfoResponseDto {
     private String keywords;
     private String classifyCode;
     private String indexNo;
+    private String pageInfo;
+    private String imgUrl;
 }

@@ -59,6 +59,7 @@ public class HttpUtilDownPage {
             String xpath3 = "/body/div[3]/div[2]/div/div[1]/div[1]/div[1]/div[1]/div[2][text()[1]]";
             // String xpath4 = "/body/div[3]/div[2]/div/div[1]/div[3]/div[1]/div[1]/div/p";
             // String xpath5 = "/body/div[3]/div[2]/div/div[1]/div[3]/div[7]/div/span/a";
+            String xpath6 = "/body/div[3]/div[2]/div/div[1]/div[1]/div[1]/div[1]/div[1]/a/img";
             // 获取书名
             var objArr = tagNode.evaluateXPath(xpath1);
             if (objArr != null && objArr.length > 0) {
@@ -125,6 +126,16 @@ public class HttpUtilDownPage {
 //                    log.info("keywords: " + keywords);
 //                }
 //            }
+            // 获取img
+            objArr = tagNode.evaluateXPath(xpath6);
+            if (objArr != null && objArr.length > 0) {
+                for (Object obj : objArr) {
+                    TagNode tagNode1 = (TagNode) obj;
+                    String url = removeWhiteLabels(tagNode1.getAttributeByName("src"));
+                    responseDto.setImgUrl(url);
+                    // log.info("author: " + author);
+                }
+            }
 
 
         }
@@ -152,6 +163,16 @@ public class HttpUtilDownPage {
                     if (bookInfo.startsWith("内容提要")){
                         responseDto.setDescription(bookInfo.replaceFirst("内容提要",""));
                         // log.info("内容提要: " + bookInfo.replaceFirst("内容提要",""));
+                    }
+                    if (bookInfo.startsWith("载体形态项")){
+                        responseDto.setPageInfo(bookInfo.replaceFirst("载体形态项",""));
+                        // log.info("内容提要: " + bookInfo.replaceFirst("内容提要",""));
+                    }
+                    if(responseDto.getName()==null){
+                        if (bookInfo.startsWith("题名与责任")){
+                            responseDto.setPageInfo(bookInfo.replaceFirst("题名与责任",""));
+                            // log.info("内容提要: " + bookInfo.replaceFirst("内容提要",""));
+                        }
                     }
                 }
             }

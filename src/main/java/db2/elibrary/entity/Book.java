@@ -20,6 +20,8 @@ public class Book {
     private String keywords;
     private String classifyCode;
     private String indexNo;
+    private String pageInfo;
+    private String imgUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Admin admin;
