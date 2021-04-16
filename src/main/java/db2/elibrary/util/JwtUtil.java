@@ -52,6 +52,21 @@ public class JwtUtil {
         return doGenerateToken(claims, user.getId());
     }
 
+    public String generateEmailValidationToken(User user, String email){
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("email", email);
+        final Date createdDate = new Date();
+        final Date expirationDate = new Date(createdDate.getTime() + 24 * 3600 * 1000);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(user.getId())
+                .setIssuedAt(createdDate)
+                .setExpiration(expirationDate)
+                .signWith(key)
+                .compact();
+    }
+
     private String doGenerateToken(Map<String, Object> claims, String id) {
         long expirationTimeLong = Long.parseLong(expiration);
 

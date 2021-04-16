@@ -44,6 +44,7 @@ public class AuthFilter extends OncePerRequestFilter {
                     List<GrantedAuthority> authorities = new ArrayList<>();
                     String role = claims.get("role", String.class);
                     authorities.add(new SimpleGrantedAuthority(role));
+                    log.info("current id: " + claims.getSubject());
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(claims.getSubject(), null, authorities);
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);

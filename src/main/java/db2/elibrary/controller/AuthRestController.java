@@ -5,10 +5,7 @@ import db2.elibrary.exception.AuthException;
 import db2.elibrary.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -43,5 +40,13 @@ public class AuthRestController {
             return authService.registerByTelSuccess(dto);
         }
         else throw new AuthException("验证码不正确");
+    }
+    @RequestMapping("/validate/email/{token}")
+    public AuthTokenResponseDto validateEmail(@PathVariable String token){
+        return authService.validateEmail(token);
+    }
+    @RequestMapping("/refresh/{token}")
+    public AuthTokenResponseDto updateToken(@PathVariable String token){
+        return authService.refreshToken(token);
     }
 }

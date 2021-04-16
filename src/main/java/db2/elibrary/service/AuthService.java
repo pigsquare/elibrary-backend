@@ -10,8 +10,10 @@ import db2.elibrary.exception.AuthException;
 public interface AuthService {
     AuthTokenResponseDto login(AuthTokenRequestDto requestDto) throws AuthException;
     User TestRegister(AddUserTestDto addUserTestDto) throws AuthException;
-    Boolean registerByEmail();
+    // Boolean registerByEmail();
     String registerByTel(String tel);
     Boolean validateTel(String tel, String code, String password);
     AuthTokenResponseDto registerByTelSuccess(ValidateByTelRequestDto dto);
+    AuthTokenResponseDto validateEmail(String token);
+    AuthTokenResponseDto refreshToken(String token);
 }
