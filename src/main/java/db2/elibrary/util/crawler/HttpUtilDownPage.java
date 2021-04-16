@@ -170,7 +170,7 @@ public class HttpUtilDownPage {
                     }
                     if(responseDto.getName()==null){
                         if (bookInfo.startsWith("题名与责任")){
-                            responseDto.setPageInfo(bookInfo.replaceFirst("题名与责任",""));
+                            responseDto.setName(bookInfo.replaceFirst("题名与责任",""));
                             // log.info("内容提要: " + bookInfo.replaceFirst("内容提要",""));
                         }
                     }
@@ -224,6 +224,6 @@ public class HttpUtilDownPage {
 
     private String addInfo(String s, String info) {
         if (s == null || s.length() == 0) return info;
-        return s + " " + info;
+        return s + ", " + info;
     }
 }
