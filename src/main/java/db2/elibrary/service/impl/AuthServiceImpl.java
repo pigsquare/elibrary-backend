@@ -13,6 +13,7 @@ import db2.elibrary.repository.UserRepository;
 import db2.elibrary.service.AuthService;
 import db2.elibrary.service.SmsService;
 import db2.elibrary.util.JwtUtil;
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,7 +23,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -34,7 +34,6 @@ public class AuthServiceImpl implements AuthService {
     private UserRepository userRepository;
     private JwtUtil jwtUtil;
     private AuthenticationManager authenticationManager;
-    private FreeMarkerConfigurer freeMarkerConfigurer;
     private PendingRegisterUserRepository pendingRegisterUserRepository;
     private SmsService smsService;
 
@@ -51,11 +50,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Autowired
-    public AuthServiceImpl(UserRepository userRepository, JwtUtil jwtUtil, AuthenticationManager authenticationManager, FreeMarkerConfigurer freeMarkerConfigurer, PendingRegisterUserRepository pendingRegisterUserRepository, SmsService smsService) {
+    public AuthServiceImpl(UserRepository userRepository, JwtUtil jwtUtil, AuthenticationManager authenticationManager, PendingRegisterUserRepository pendingRegisterUserRepository, SmsService smsService) {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
         this.authenticationManager = authenticationManager;
-        this.freeMarkerConfigurer = freeMarkerConfigurer;
         this.pendingRegisterUserRepository = pendingRegisterUserRepository;
         this.smsService = smsService;
     }
@@ -70,15 +68,6 @@ public class AuthServiceImpl implements AuthService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             User user = (User) authentication.getPrincipal();
             return generateTokenResponse(user);
-//            String jwtToken = jwtUtil.generateToken(user);
-//            AuthTokenResponseDto responseDto = new AuthTokenResponseDto();
-//            responseDto.setName(user.getName());
-//            responseDto.setToken(jwtToken);
-//            responseDto.setExpiration(jwtUtil.getExpirationDateFromToken(jwtToken).getTime());
-//            responseDto.setId(user.getId());
-//            responseDto.setRole(user.getRole());
-//            responseDto.setUsername(user.getUsername());
-//            return responseDto;
         } catch (DisabledException e) {
             log.warn("forbidden");
             throw new AuthException("你的账号被禁止登录！");
@@ -100,10 +89,6 @@ public class AuthServiceImpl implements AuthService {
         return user;
     }
 
-    @Override
-    public Boolean registerByEmail() {
-        return null;
-    }
 
     @Override
     public String registerByTel(String tel) {
@@ -162,6 +147,39 @@ public class AuthServiceImpl implements AuthService {
             return generateTokenResponse(user);
         }
 
+        return null;
+    }
+
+    @Override
+    public AuthTokenResponseDto validateEmail(String token) {
+        try {
+            if(jwtUtil.validateToken(token)){
+                Claims claims = jwtUtil.getAllClaimsFromToken(token);
+                String id = claims.getSubject();
+                User user = userRepository.getOne(id);
+                user.setEmail(claims.get("email", String.class));
+                userRepository.save(user);
+                return generateTokenResponse(user);
+            }
+        } catch (Exception e){
+            log.warn("Validate Email Failed");
+        }
+
+        return null;
+    }
+
+    @Override
+    public AuthTokenResponseDto refreshToken(String token) {
+        try {
+            if(jwtUtil.validateToken(token)){
+                Claims claims = jwtUtil.getAllClaimsFromToken(token);
+                String id = claims.getSubject();
+                User user = userRepository.getOne(id);
+                return generateTokenResponse(user);
+            }
+        } catch (Exception e){
+            log.warn("Refresh Token Error");
+        }
         return null;
     }
 }

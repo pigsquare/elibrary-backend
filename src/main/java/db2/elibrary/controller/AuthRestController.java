@@ -1,16 +1,11 @@
 package db2.elibrary.controller;
 
-import db2.elibrary.dto.AuthTokenRequestDto;
-import db2.elibrary.dto.AuthTokenResponseDto;
-import db2.elibrary.dto.RegisterByTelDto;
-import db2.elibrary.dto.ValidateByTelRequestDto;
+import db2.elibrary.dto.*;
+import db2.elibrary.exception.AuthException;
 import db2.elibrary.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -32,16 +27,26 @@ public class AuthRestController {
         return authService.login(requestDto);
     }
     @PostMapping("/register/tel")
-    public String registerByTel(@Valid @RequestBody RegisterByTelDto dto){
+    public CommonResponseDto registerByTel(@Valid @RequestBody RegisterByTelDto dto){
         dto.addPrefix();
-        return authService.registerByTel(dto.getTel());
+        CommonResponseDto responseDto = new CommonResponseDto();
+        responseDto.setMessage(authService.registerByTel(dto.getTel()));
+        return responseDto;
     }
     @PostMapping("/validate/tel")
-    public AuthTokenResponseDto validateTel(@Valid @RequestBody ValidateByTelRequestDto dto){
+    public AuthTokenResponseDto validateTel(@Valid @RequestBody ValidateByTelRequestDto dto)throws AuthException {
         dto.addPrefix();
         if(authService.validateTel(dto.getPrefixTel(),dto.getCode(),dto.getPassword())){
             return authService.registerByTelSuccess(dto);
         }
-        return null;
+        else throw new AuthException("验证码不正确");
+    }
+    @RequestMapping("/validate/email/{token}")
+    public AuthTokenResponseDto validateEmail(@PathVariable String token){
+        return authService.validateEmail(token);
+    }
+    @RequestMapping("/refresh/{token}")
+    public AuthTokenResponseDto updateToken(@PathVariable String token){
+        return authService.refreshToken(token);
     }
 }

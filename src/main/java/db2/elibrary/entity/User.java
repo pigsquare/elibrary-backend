@@ -49,7 +49,16 @@ public class User implements UserDetails {
     @Column(unique = true)
     private String tel;
 
+    private String cardNo;
+
     private boolean enabled = true;
+
+    private Double balance = 0.0;
+
+    private Integer credit = 100;
+
+    @ManyToOne
+    private Grade grade;
 
     @Override
     @JsonIgnore

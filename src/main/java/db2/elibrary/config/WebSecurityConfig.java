@@ -22,7 +22,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+    @Autowired
     private AuthFilter authFilter;
+    @Qualifier("userDetailsServiceImpl")
+    @Autowired
     private UserDetailsService userDetailsService;
 
     @Autowired
@@ -69,6 +72,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/login").permitAll()
                 .antMatchers("/test/**").permitAll()
                 .antMatchers("/search/**").permitAll()
+                .antMatchers("/admin/page").hasIpAddress("127.0.0.1")
                 .antMatchers("/wish/**").hasAnyRole("USER", "STAFF", "ADMIN")
                 .anyRequest().authenticated();
 

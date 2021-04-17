@@ -29,7 +29,7 @@ public class MailServiceImpl implements MailService {
         MimeMessage message = mailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            String from = "no-reply@service.shu.fyi";
+            String from = "no-reply@squarepig.cn";
             helper.setFrom(from);
             helper.setTo(to);
             helper.setSubject(subject);
