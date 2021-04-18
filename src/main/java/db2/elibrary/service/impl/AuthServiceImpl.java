@@ -163,6 +163,7 @@ public class AuthServiceImpl implements AuthService {
             }
         } catch (Exception e){
             log.warn("Validate Email Failed");
+            throw new AuthException("invalid");
         }
 
         return null;
@@ -179,6 +180,7 @@ public class AuthServiceImpl implements AuthService {
             }
         } catch (Exception e){
             log.warn("Refresh Token Error");
+            throw new AuthException("invalid");
         }
         return null;
     }
