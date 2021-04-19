@@ -129,6 +129,7 @@ public class AuthServiceImpl implements AuthService {
                 User newUser = new User();
                 newUser.setTel(tel);
                 newUser.setUsername(username);
+                newUser.setName("用户" + username);
                 newUser.setUnencodedPassword(password);
                 userRepository.save(newUser);
                 pendingRegisterUserRepository.delete(pendingRegisterUser.get());

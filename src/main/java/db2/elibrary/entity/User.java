@@ -17,6 +17,7 @@ import java.util.List;
 
 @Data
 @Entity
+@Table
 public class User implements UserDetails {
     @Id
     @GeneratedValue(generator = "UUID")

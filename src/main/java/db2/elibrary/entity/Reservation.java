@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 
 @Data
 @Entity
+@Table
 public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

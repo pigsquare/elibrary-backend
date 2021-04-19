@@ -6,6 +6,7 @@ import javax.persistence.*;
 
 @Data
 @Entity
+@Table
 public class Book {
     @Id
     private String isbn;
