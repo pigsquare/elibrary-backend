@@ -50,6 +50,7 @@ public class HttpUtilDownPage {
     public IsbnInfoResponseDto parseBookInfo(String isbn) throws XPatherException {
         IsbnInfoResponseDto responseDto = new IsbnInfoResponseDto();
         responseDto.setIsbn(isbn);
+        responseDto.setImgUrl("./assets/images/book.jpg");
         String contents = HttpUtilDownPage.sendGet("https://book.douban.com/isbn/" + isbn);
         if (contents != null && !contents.isEmpty()) {
             HtmlCleaner htmlCleaner = new HtmlCleaner();
@@ -132,7 +133,7 @@ public class HttpUtilDownPage {
                 for (Object obj : objArr) {
                     TagNode tagNode1 = (TagNode) obj;
                     String url = removeWhiteLabels(tagNode1.getAttributeByName("src"));
-                    responseDto.setImgUrl(url);
+                    responseDto.setImgUrl("https://images.weserv.nl/?url="+url);
                     // log.info("author: " + author);
                 }
             }
