@@ -1,6 +1,7 @@
 package db2.elibrary.service.impl;
 
 import db2.elibrary.dto.BookInfoResponseDto;
+import db2.elibrary.dto.BookSearchRequestDto;
 import db2.elibrary.dto.IsbnInfoResponseDto;
 import db2.elibrary.dto.UpdateBookRequestDto;
 import db2.elibrary.entity.Admin;
@@ -75,6 +76,37 @@ public class BookServiceImpl implements BookService {
         for(Book book: books){
             BookInfoResponseDto newRes = new BookInfoResponseDto(book);
             responseDto.add(newRes);
+        }
+        return responseDto;
+    }
+
+    @Override
+    public List<BookInfoResponseDto> searchBooks(BookSearchRequestDto searchRequestDto) {
+        List<BookInfoResponseDto> responseDto = new ArrayList<>();
+        List<Book> books = new ArrayList<>();
+        String searchWord = "%" + searchRequestDto.getWord() + "%";
+        switch (searchRequestDto.getMethod()){
+            case 1: {
+                books = bookRepository.findByNameLike(searchWord);
+                break;
+            }
+            case 2: {
+                var book = bookRepository.findById(searchRequestDto.getWord());
+                book.ifPresent(value -> responseDto.add(new BookInfoResponseDto(value)));
+                break;
+            }
+            case 3: {
+                books = bookRepository.findByAuthorLike(searchWord);
+                break;
+            }
+            default: {
+                books = bookRepository.findByNameLikeOrAuthorLikeOrKeywordsLikeOrIndexNoLikeOrDescriptionLike(
+                        searchWord, searchWord, searchWord, searchWord, searchWord);
+                break;
+            }
+        }
+        for (Book book: books) {
+            responseDto.add(new BookInfoResponseDto(book));
         }
         return responseDto;
     }
