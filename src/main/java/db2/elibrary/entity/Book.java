@@ -1,5 +1,6 @@
 package db2.elibrary.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import db2.elibrary.dto.UpdateBookRequestDto;
 import lombok.Data;
@@ -26,7 +27,8 @@ public class Book {
     private String pageInfo;
     private String imgUrl;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Admin admin;
 
     public void setBookInfo(UpdateBookRequestDto requestDto){

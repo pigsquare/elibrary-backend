@@ -1,5 +1,7 @@
 package db2.elibrary.service.impl;
 
+import db2.elibrary.dto.BookInfoResponseDto;
+import db2.elibrary.dto.IsbnInfoResponseDto;
 import db2.elibrary.dto.UpdateBookRequestDto;
 import db2.elibrary.entity.Admin;
 import db2.elibrary.entity.Book;
@@ -12,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,12 +61,21 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book getBook(String isbn) {
-        return bookRepository.getOne(isbn);
+    public IsbnInfoResponseDto getBook(String isbn) {
+        Book book = bookRepository.getOne(isbn);
+        IsbnInfoResponseDto responseDto = new IsbnInfoResponseDto();
+        responseDto.phraseFromBook(book);
+        return responseDto;
     }
 
     @Override
-    public List<Book> getBooks() {
-        return bookRepository.findAll();
+    public List<BookInfoResponseDto> getBooks() {
+        List<Book> books = bookRepository.findAll();
+        List<BookInfoResponseDto> responseDto = new ArrayList<>();
+        for(Book book: books){
+            BookInfoResponseDto newRes = new BookInfoResponseDto(book);
+            responseDto.add(newRes);
+        }
+        return responseDto;
     }
 }

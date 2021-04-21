@@ -1,5 +1,6 @@
 package db2.elibrary.controller;
 
+import db2.elibrary.dto.BookInfoResponseDto;
 import db2.elibrary.dto.UpdateBookRequestDto;
 import db2.elibrary.entity.Book;
 import db2.elibrary.service.BookService;
@@ -21,7 +22,7 @@ public class BookRestController {
     }
 
     @GetMapping("/all")
-    public List<Book> getAllBooks(){
+    public List<BookInfoResponseDto> getAllBooks(){
         return bookService.getBooks();
     }
 
@@ -35,5 +36,11 @@ public class BookRestController {
     @PostMapping("/update")
     public Book updateBook(@RequestBody @Valid UpdateBookRequestDto requestDto){
         return bookService.updateBook(requestDto);
+    }
+
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
+    @DeleteMapping("/del/{isbn}")
+    public Boolean delBook(@PathVariable String isbn){
+        return bookService.delBook(isbn);
     }
 }
