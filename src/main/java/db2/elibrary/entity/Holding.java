@@ -18,6 +18,8 @@ public class Holding {
 
     @Enumerated(EnumType.STRING)
     private BookStatusEnum status;
+
+    @Column(unique = true)
     private String barcode;
 
     @ManyToOne

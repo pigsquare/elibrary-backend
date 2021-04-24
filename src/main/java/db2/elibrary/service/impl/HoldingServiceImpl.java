@@ -58,7 +58,7 @@ public class HoldingServiceImpl implements HoldingService {
             throw new AuthException("");
         }
         holding.setBook(optionalBook.get());
-        holding.setStatus(BookStatusEnum.AVAILABLE);
+        holding.setStatus(BookStatusEnum.valueOf(requestDto.getStatus()));
         holdingRepository.save(holding);
         return true;
     }

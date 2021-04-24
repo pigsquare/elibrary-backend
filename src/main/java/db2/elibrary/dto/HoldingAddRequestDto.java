@@ -13,4 +13,6 @@ public class HoldingAddRequestDto {
     @NotNull
     @NotBlank
     private String isbn;
+
+    private String status = "AVAILABLE";
 }

@@ -10,6 +10,7 @@ public class BookInfoResponseDto {
     private String author;
     private String publisher;
     private String imgUrl;
+    private String indexNo;
 
     public BookInfoResponseDto(Book book){
         this.isbn = book.getIsbn();
@@ -17,5 +18,6 @@ public class BookInfoResponseDto {
         this.name = book.getName();
         this.imgUrl = book.getImgUrl();
         this.publisher = book.getPublisher();
+        this.indexNo = book.getIndexNo();
     }
 }
