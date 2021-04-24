@@ -7,6 +7,7 @@ import javax.persistence.*;
 
 @Data
 @Entity
+@Table
 public class Holding {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,6 +18,8 @@ public class Holding {
 
     @Enumerated(EnumType.STRING)
     private BookStatusEnum status;
+
+    @Column(unique = true)
     private String barcode;
 
     @ManyToOne

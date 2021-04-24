@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 
 @Entity
 @Data
+@Table
 public class PendingRegisterUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

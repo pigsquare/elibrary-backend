@@ -5,6 +5,7 @@ import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import db2.elibrary.dto.IsbnInfoResponseDto;
+import db2.elibrary.repository.BookRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
@@ -20,6 +21,11 @@ import java.util.regex.Pattern;
 @Service
 public class HttpUtilDownPage {
     private static final WebClient webClient = new WebClient(BrowserVersion.CHROME);
+    private BookRepository bookRepository;
+
+    public HttpUtilDownPage(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
+    }
 
     private static String sendGet(String url) {
         // js出错不抛出异常
@@ -50,6 +56,7 @@ public class HttpUtilDownPage {
     public IsbnInfoResponseDto parseBookInfo(String isbn) throws XPatherException {
         IsbnInfoResponseDto responseDto = new IsbnInfoResponseDto();
         responseDto.setIsbn(isbn);
+        responseDto.setImgUrl("./assets/images/book.jpg");
         String contents = HttpUtilDownPage.sendGet("https://book.douban.com/isbn/" + isbn);
         if (contents != null && !contents.isEmpty()) {
             HtmlCleaner htmlCleaner = new HtmlCleaner();
@@ -132,7 +139,7 @@ public class HttpUtilDownPage {
                 for (Object obj : objArr) {
                     TagNode tagNode1 = (TagNode) obj;
                     String url = removeWhiteLabels(tagNode1.getAttributeByName("src"));
-                    responseDto.setImgUrl(url);
+                    responseDto.setImgUrl("https://images.weserv.nl/?url="+url);
                     // log.info("author: " + author);
                 }
             }
@@ -155,6 +162,8 @@ public class HttpUtilDownPage {
                     if (bookInfo.startsWith("中图分类号")){
                         responseDto.setClassifyCode(bookInfo.replaceFirst("中图分类号",""));
                         // log.info("中图分类号: " + bookInfo.replaceFirst("中图分类号",""));
+                        long num = 1 + bookRepository.countByClassifyCodeIs(responseDto.getClassifyCode());
+                        responseDto.setIndexNo(responseDto.getClassifyCode()+"-"+num);
                     }
                     if (bookInfo.startsWith("主题")){
                         responseDto.setKeywords(bookInfo.replaceFirst("主题",""));

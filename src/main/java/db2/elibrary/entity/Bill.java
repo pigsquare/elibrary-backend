@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 
 @Data
 @Entity
+@Table
 public class Bill {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -5,6 +5,7 @@ import db2.elibrary.dto.AddUserTestDto;
 import db2.elibrary.dto.IsbnInfoResponseDto;
 import db2.elibrary.entity.User;
 import db2.elibrary.service.AuthService;
+import db2.elibrary.service.HoldingService;
 import db2.elibrary.service.MailService;
 import db2.elibrary.service.SmsService;
 import db2.elibrary.util.AliPayUtil;
@@ -30,6 +31,8 @@ public class TestRestController{
     private JavaMailSender mailSender;
     @Autowired
     private HttpUtilDownPage httpUtilDownPage;
+    @Autowired
+    private HoldingService holdingService;
     @PostMapping("/adduser")
     public User AddUser(@Valid @RequestBody AddUserTestDto addUserTestDto){
         return authService.TestRegister(addUserTestDto);
@@ -54,6 +57,10 @@ public class TestRestController{
     @RequestMapping("/book/info/{isbn}")
     public IsbnInfoResponseDto getBookInfo(@PathVariable String isbn) throws XPatherException {
         return httpUtilDownPage.parseBookInfo(isbn);
+    }
+    @RequestMapping("/isbn/barcode/{isbn}")
+    public String getBarcodeByIsbn(@PathVariable String isbn){
+        return holdingService.getBarcode(isbn);
     }
 
 }

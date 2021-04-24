@@ -129,6 +129,7 @@ public class AuthServiceImpl implements AuthService {
                 User newUser = new User();
                 newUser.setTel(tel);
                 newUser.setUsername(username);
+                newUser.setName("用户" + username);
                 newUser.setUnencodedPassword(password);
                 userRepository.save(newUser);
                 pendingRegisterUserRepository.delete(pendingRegisterUser.get());
@@ -163,6 +164,7 @@ public class AuthServiceImpl implements AuthService {
             }
         } catch (Exception e){
             log.warn("Validate Email Failed");
+            throw new AuthException("invalid");
         }
 
         return null;
@@ -179,6 +181,7 @@ public class AuthServiceImpl implements AuthService {
             }
         } catch (Exception e){
             log.warn("Refresh Token Error");
+            throw new AuthException("invalid");
         }
         return null;
     }
