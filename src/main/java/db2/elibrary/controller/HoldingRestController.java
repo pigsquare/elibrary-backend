@@ -2,9 +2,12 @@ package db2.elibrary.controller;
 
 import db2.elibrary.dto.CommonResponseDto;
 import db2.elibrary.dto.HoldingAddRequestDto;
+import db2.elibrary.dto.HoldingInfoResponseDto;
 import db2.elibrary.service.HoldingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/holding")
@@ -29,4 +32,10 @@ public class HoldingRestController {
         responseDto.setArgs(holdingService.addHolding(requestDto));
         return responseDto;
     }
+
+    @GetMapping("/info/{isbn}")
+    public List<HoldingInfoResponseDto> getInfoByIsbn(@PathVariable String isbn){
+        return holdingService.getHoldingsByIsbn(isbn);
+    }
+
 }

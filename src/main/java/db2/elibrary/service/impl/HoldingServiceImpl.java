@@ -1,10 +1,12 @@
 package db2.elibrary.service.impl;
 
 import db2.elibrary.dto.HoldingAddRequestDto;
+import db2.elibrary.dto.HoldingInfoResponseDto;
 import db2.elibrary.entity.Admin;
 import db2.elibrary.entity.Holding;
 import db2.elibrary.entity.enums.BookStatusEnum;
 import db2.elibrary.exception.AuthException;
+import db2.elibrary.exception.NotFoundException;
 import db2.elibrary.repository.AdminRepository;
 import db2.elibrary.repository.BookRepository;
 import db2.elibrary.repository.HoldingRepository;
@@ -14,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -61,5 +65,19 @@ public class HoldingServiceImpl implements HoldingService {
         holding.setStatus(BookStatusEnum.valueOf(requestDto.getStatus()));
         holdingRepository.save(holding);
         return true;
+    }
+
+    @Override
+    public List<HoldingInfoResponseDto> getHoldingsByIsbn(String isbn) {
+        var optionalBook = bookRepository.findById(isbn);
+        if(optionalBook.isEmpty()){
+            throw new NotFoundException("");
+        }
+        var holdings = holdingRepository.findByBook(optionalBook.get());
+        List<HoldingInfoResponseDto> res = new ArrayList<>();
+        for(Holding holding: holdings){
+            res.add(new HoldingInfoResponseDto(holding));
+        }
+        return res;
     }
 }
