@@ -2,6 +2,7 @@ package db2.elibrary.controller;
 
 import db2.elibrary.dto.ChangePasswordRequestDto;
 import db2.elibrary.dto.CommonResponseDto;
+import db2.elibrary.dto.LibraryCardRequestDto;
 import db2.elibrary.entity.User;
 import db2.elibrary.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,5 +35,11 @@ public class UserRestController {
             responseDto.setMessage("修改失败");
         }
         return responseDto;
+    }
+
+    // TODO: 办理借书证
+    @PostMapping("/card")
+    public CommonResponseDto libraryCardProcess(@RequestBody @Valid LibraryCardRequestDto requestDto){
+        return null;
     }
 }
