@@ -9,6 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service("user_service")
 public class UserServiceImpl implements UserService {
@@ -38,5 +39,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getAll() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public Boolean UpdateCardNo(String tel, String cardNo) {
+        Optional<User> optionalUser = userRepository.findByTel(tel);
+        if(optionalUser.isEmpty())
+            return false;
+        User user = optionalUser.get();
+        user.setCardNo(cardNo);
+        userRepository.save(user);
+        return true;
     }
 }

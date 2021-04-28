@@ -1,6 +1,7 @@
 package db2.elibrary.service;
 
 import db2.elibrary.entity.User;
+import org.apache.xpath.operations.Bool;
 
 import java.util.List;
 
@@ -15,4 +16,5 @@ public interface UserService {
 //    Boolean verifyEmail(String token);
 //    Boolean prepay(Double amount);
     List<User> getAll();
+    Boolean UpdateCardNo(String tel,String cardNo);
 }

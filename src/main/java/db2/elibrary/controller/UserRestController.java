@@ -37,9 +37,14 @@ public class UserRestController {
         return responseDto;
     }
 
-    // TODO: 办理借书证
     @PostMapping("/card")
     public CommonResponseDto libraryCardProcess(@RequestBody @Valid LibraryCardRequestDto requestDto){
-        return null;
+        CommonResponseDto responseDto = new CommonResponseDto();
+        if(userService.UpdateCardNo(requestDto.getTel(), requestDto.getCardNo())){
+            responseDto.setMessage("录入成功");
+        }else{
+            responseDto.setMessage("录入失败");
+        }
+        return responseDto;
     }
 }
