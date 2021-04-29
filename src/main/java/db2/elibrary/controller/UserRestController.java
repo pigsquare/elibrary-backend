@@ -40,7 +40,7 @@ public class UserRestController {
     @PostMapping("/card")
     public CommonResponseDto libraryCardProcess(@RequestBody @Valid LibraryCardRequestDto requestDto){
         CommonResponseDto responseDto = new CommonResponseDto();
-        if(userService.UpdateCardNo(requestDto.getTel(), requestDto.getCardNo())){
+        if(userService.UpdateCardNo("+86"+requestDto.getTel(), requestDto.getCardNo())){
             responseDto.setMessage("录入成功");
         }else{
             responseDto.setMessage("录入失败");

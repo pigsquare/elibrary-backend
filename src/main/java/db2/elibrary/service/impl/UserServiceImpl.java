@@ -1,6 +1,8 @@
 package db2.elibrary.service.impl;
 
 import db2.elibrary.entity.User;
+import db2.elibrary.exception.AuthException;
+import db2.elibrary.exception.NotFoundException;
 import db2.elibrary.repository.UserRepository;
 import db2.elibrary.service.UserService;
 import db2.elibrary.util.UserUtil;
@@ -51,4 +53,15 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         return true;
     }
+
+    @Override
+    public Double getBalance(String tel) throws NotFoundException{
+        Optional<User> optionalUser = userRepository.findByTel(tel);
+        if(optionalUser.isEmpty()) {
+            throw new NotFoundException("该手机号未注册！");
+        }
+        User user = optionalUser.get();
+        return user.getBalance();
+    }
+
 }
