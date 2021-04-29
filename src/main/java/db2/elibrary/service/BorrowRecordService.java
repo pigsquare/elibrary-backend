@@ -11,6 +11,8 @@ public interface BorrowRecordService {
     Boolean returnHolding(String barcode);
     //续借
     Boolean renewHolding(Integer recordId);
-    //获取当前借书列表
+    //获取当前用户借书列表
     List<BorrowRecord> getList();
+    //获取当前用户借书未还列表
+    List<BorrowRecord> getBorrowingList();
 }

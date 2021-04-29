@@ -153,4 +153,11 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         borrowRecordList = borrowRecordRepository.findByUser_IdOrderByBorrowTimeDesc(UserUtil.getCurrentUserAccount());
         return borrowRecordList;
     }
+
+    @Override
+    public List<BorrowRecord> getBorrowingList() {
+        List<BorrowRecord> borrowRecordList;
+        borrowRecordList = borrowRecordRepository.findByUser_IdAndReturnTimeIsNullOrderByBorrowTimeDesc(UserUtil.getCurrentUserAccount());
+        return borrowRecordList;
+    }
 }

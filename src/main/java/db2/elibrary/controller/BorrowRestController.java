@@ -5,7 +5,6 @@ import db2.elibrary.dto.BorrowRecordResponseDto;
 import db2.elibrary.dto.CommonResponseDto;
 import db2.elibrary.entity.BorrowRecord;
 import db2.elibrary.service.BorrowRecordService;
-import db2.elibrary.service.HoldingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -67,9 +66,13 @@ public class BorrowRestController {
         return borrowRecordResponseDtoList;
     }
 
-    // TODO: 获取当前未还的借书列表
     @GetMapping("/list/borrowing")
     public List<BorrowRecordResponseDto> getBorrowingList(){
-        return null;
+        List<BorrowRecordResponseDto> borrowRecordResponseDtoList = new ArrayList<>();
+        List<BorrowRecord> borrowRecordList = borrowRecordService.getBorrowingList();
+        for(BorrowRecord borrowRecord:borrowRecordList){
+            borrowRecordResponseDtoList.add(new BorrowRecordResponseDto(borrowRecord));
+        }
+        return borrowRecordResponseDtoList;
     }
 }
