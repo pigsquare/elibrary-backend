@@ -3,8 +3,10 @@ package db2.elibrary.controller;
 import db2.elibrary.dto.ChangePasswordRequestDto;
 import db2.elibrary.dto.CommonResponseDto;
 import db2.elibrary.dto.LibraryCardRequestDto;
+import db2.elibrary.dto.UserProfileResponseDto;
 import db2.elibrary.entity.User;
 import db2.elibrary.service.UserService;
+import db2.elibrary.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,11 +42,17 @@ public class UserRestController {
     @PostMapping("/card")
     public CommonResponseDto libraryCardProcess(@RequestBody @Valid LibraryCardRequestDto requestDto){
         CommonResponseDto responseDto = new CommonResponseDto();
-        if(userService.UpdateCardNo(requestDto.getTel(), requestDto.getCardNo())){
+        if(userService.UpdateCardNo("+86"+requestDto.getTel(), requestDto.getCardNo())){
             responseDto.setMessage("录入成功");
         }else{
             responseDto.setMessage("录入失败");
         }
         return responseDto;
+    }
+
+    @GetMapping("/profile")
+    public UserProfileResponseDto getProfile(){
+        User user = userService.getProfile();
+        return new UserProfileResponseDto(user);
     }
 }
