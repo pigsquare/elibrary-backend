@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--suppress XmlDefaultAttributeValue -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN" lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>图书可预约提醒 - XXX图书馆</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #F5F5F5">
+<div style="margin: 0; background-color: #F5F5F5; font-size: 14px; font-weight: 400; font-family: PingFang SC, Verdana, Helvetica Neue, Microsoft Yahei, Hiragino Sans GB, Microsoft Sans Serif, WenQuanYi Micro Hei, sans-serif; text-align: center; vertical-align: middle; padding: 15px">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%"
+           style="border-collapse: collapse; margin:0 auto; box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.05); border: solid 1px #EEEEEE; width: 100%; max-width: 720px">
+        <tr style="background-color: #FFFFFF">
+            <td style="padding: 30px 40px; text-align: left">
+                <h1 style="font-size: 21px; font-weight: 400; line-height: 1.4; margin: 15px 0 5px; word-wrap: break-word; word-break: break-all; color: #607D8B">
+                    你好，${name?html}！</h1>
+                <p style="font-size: 15px; font-weight: 400; line-height: 1.4; margin: 5px 0 30px; color: #9E9E9E">
+                    欢迎使用XXX图书馆图书预约系统。</p>
+                <p style="font-size: 15px; font-weight: 400; line-height: 1.4; margin: 15px 0 7px; word-wrap: break-word; word-break: break-all">
+                    <strong>您已经成功获得心仪图书的预约权！若成功预约，其保留期限为${reserved_day}天，请在规定时间内完成对心仪图书的借阅工作。若逾期，本次预约将作废。</strong>
+                </p>
+
+                <p style="font-size: 14px; font-weight: 400; line-height: 1.4; margin: 15px 0 7px; word-wrap: break-word; word-break: break-all">
+                    祝您即将拥有愉快的阅读体验！
+                </p>
+                <p style="font-size: 12px; font-weight: 400; color: #9E9E9E; line-height: 1.4; margin: 30px 0 7px; word-wrap: break-word; word-break: break-all">
+                    如果不是本人操作，请忽略该邮件。请勿回复此邮件。</p>
+            </td>
+        </tr>
+        <tr style="background-color: #FAFAFA; border-top: solid 1px #EEEEEE">
+            <td style="padding: 30px 40px; text-align: center">
+                <p style="font-size: 12px; font-weight: 400; color: #9E9E9E; line-height: 1; margin: 0">
+                    ${year} &copy; lib.XXX
+                </p>
+            </td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>
