@@ -49,8 +49,8 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         if (user.getBalance() < 0)
             throw new AuthException("账户余额不足，请及时缴费！");
         //用户是否超过借书上限
-        log.info("当前已借书数量："+borrowRecordRepository.countByUserAndReturnTimeIsNull(user));
-        if(borrowRecordRepository.countByUserAndReturnTimeIsNull(user) >= user.getGrade().getMaxHoldings()){
+        log.info("当前已借书数量：" + borrowRecordRepository.countByUserAndReturnTimeIsNull(user));
+        if (borrowRecordRepository.countByUserAndReturnTimeIsNull(user) >= user.getGrade().getMaxHoldings()) {
             throw new AuthException("超过借书上限!");
         }
 
@@ -58,24 +58,24 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         Holding holding = holdingService.getHoldingByBarcode(barcode);
         if (holding.getStatus() == BookStatusEnum.RESERVED) {
             Reservation reservation = reservationService.findByBookIdAndUserId(holding.getId(), user.getId());
-            if(reservation != null && !reservation.getComplete() && reservation.getStatus()==ReserveStatusEnum.RESERVED && reservation.getLastDate().compareTo(new Date())>=0){
+            if (reservation != null && !reservation.getComplete() && reservation.getStatus() == ReserveStatusEnum.RESERVED && reservation.getLastDate().compareTo(new Date()) >= 0) {
                 reservation.setComplete(true);
                 reservation.setStatus(ReserveStatusEnum.FINISHED);
                 reservationService.saveReservation(reservation);
-                _borrowHolding(user,holding);
+                _borrowHolding(user, holding);
                 return true;
             }
-        } else if(holding.getStatus() == BookStatusEnum.AVAILABLE){
-            _borrowHolding(user,holding);
+        } else if (holding.getStatus() == BookStatusEnum.AVAILABLE) {
+            _borrowHolding(user, holding);
             return true;
         }
         return false;
     }
 
-    private void _borrowHolding(User user,Holding holding){
+    private void _borrowHolding(User user, Holding holding) {
         BorrowRecord borrowRecord = new BorrowRecord();
         borrowRecord.setBook(holding);
-        var optionalAdmin=adminRepository.findByUserId(UserUtil.getCurrentUserAccount());
+        var optionalAdmin = adminRepository.findByUserId(UserUtil.getCurrentUserAccount());
         optionalAdmin.ifPresent(borrowRecord::setAgent);
         borrowRecord.setExtend(false);
         borrowRecord.setBorrowTime(new Timestamp(new Date().getTime()));
@@ -91,21 +91,21 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
     @Override
     public Boolean returnHolding(String barcode) {
         Holding holding = holdingService.getHoldingByBarcode(barcode);
-        if(holding == null){
+        if (holding == null) {
             throw new NotFoundException("");
         }
 
         List<BorrowRecord> borrowRecordList = borrowRecordRepository.findByBook_BarcodeAndReturnTimeIsNullOrderByBorrowTimeDesc(barcode);
-        if(borrowRecordList.isEmpty()){
+        if (borrowRecordList.isEmpty()) {
             processHoldingOfReturn(holding);
             throw new NotFoundException("没有借出记录");
         }
         BorrowRecord borrowRecord = borrowRecordList.get(0);
         User user = borrowRecord.getUser();
-        if(borrowRecord.getLastReturnDate().compareTo(new Date()) > 0){
-            user.setBalance(user.getBalance()-borrowRecord.getLateFee());
+        if (borrowRecord.getLastReturnDate().compareTo(new Date()) > 0) {
+            user.setBalance(user.getBalance() - borrowRecord.getLateFee());
         }
-        user.setCredit(user.getCredit()+1);
+        user.setCredit(user.getCredit() + 1);
         userService.updateUser(user);
         borrowRecord.setReturnTime(new Timestamp(new Date().getTime()));
         borrowRecordRepository.save(borrowRecord);
@@ -121,11 +121,11 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         return true;
     }
 
-    private void processHoldingOfReturn(Holding holding){
-        if(holding.getStatus()==BookStatusEnum.BORROWED){
+    private void processHoldingOfReturn(Holding holding) {
+        if (holding.getStatus() == BookStatusEnum.BORROWED) {
             holding.setStatus(BookStatusEnum.AVAILABLE);
             holdingRepository.save(holding);
-        } else if(holding.getStatus()==BookStatusEnum.BORROWED_AND_BOOKED){
+        } else if (holding.getStatus() == BookStatusEnum.BORROWED_AND_BOOKED) {
             //TODO: 被预定，发邮件/短信通知预定者
             holding.setStatus(BookStatusEnum.RESERVED);
             holdingRepository.save(holding);
@@ -135,12 +135,16 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
     @Override
     public Boolean renewHolding(Integer recordId) {
         Optional<BorrowRecord> borrowRecordOptional = borrowRecordRepository.findById(recordId);
-        if(borrowRecordOptional.isEmpty()){
+        if (borrowRecordOptional.isEmpty()) {
             throw new NotFoundException("借阅记录不存在");
         }
         BorrowRecord borrowRecord = borrowRecordOptional.get();
-        if(borrowRecord.getExtend()){
+        if (borrowRecord.getExtend()) {
             throw new AuthException("不可再次续借");
+        }
+
+        if (borrowRecord.getUser().getBalance() < 0) {
+            throw new AuthException("账户余额不足，请缴费后再进行续借操作！");
         }
         borrowRecord.setExtend(true);
         borrowRecord.setLastReturnDate(new java.sql.Date((long) (borrowRecord.getUser().getGrade().getMaxBorrowTime()) * 24 * 3600 * 1000
