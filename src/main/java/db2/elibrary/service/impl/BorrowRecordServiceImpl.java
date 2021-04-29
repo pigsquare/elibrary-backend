@@ -6,6 +6,7 @@ import db2.elibrary.entity.enums.ReserveStatusEnum;
 import db2.elibrary.exception.AuthException;
 import db2.elibrary.repository.AdminRepository;
 import db2.elibrary.repository.BorrowRecordRepository;
+import db2.elibrary.repository.HoldingRepository;
 import db2.elibrary.service.BorrowRecordService;
 import db2.elibrary.service.HoldingService;
 import db2.elibrary.service.ReservationService;
@@ -26,24 +27,27 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
     private ReservationService reservationService;
     private UserService userService;
     private AdminRepository adminRepository;
+    private HoldingRepository holdingRepository;
 
     @Autowired
-    public BorrowRecordServiceImpl(BorrowRecordRepository borrowRecordRepository, HoldingService holdingService, ReservationService reservationService, UserService userService, AdminRepository adminRepository) {
+    public BorrowRecordServiceImpl(BorrowRecordRepository borrowRecordRepository, HoldingService holdingService, ReservationService reservationService, UserService userService, AdminRepository adminRepository, HoldingRepository holdingRepository) {
         this.borrowRecordRepository = borrowRecordRepository;
         this.holdingService = holdingService;
         this.reservationService = reservationService;
         this.userService = userService;
         this.adminRepository = adminRepository;
+        this.holdingRepository = holdingRepository;
     }
 
     @Override
     public Boolean borrowHolding(String cardNo, String barcode) {
         //用户是否欠费
         User user = userService.getUserByCardNo(cardNo);
-        if (user.getBalance() <= 0)
+        if (user.getBalance() < 0)
             throw new AuthException("账户余额不足，请及时缴费！");
         //用户是否超过借书上限
-        if(borrowRecordRepository.countBorrowRecordsByUserAndReturnTimeIsNull(user) >= user.getGrade().getMaxHoldings()){
+        log.info("当前已借书数量："+borrowRecordRepository.countByUserAndReturnTimeIsNull(user));
+        if(borrowRecordRepository.countByUserAndReturnTimeIsNull(user) >= user.getGrade().getMaxHoldings()){
             throw new AuthException("超过借书上限!");
         }
 
@@ -56,23 +60,28 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
                 reservation.setStatus(ReserveStatusEnum.FINISHED);
                 reservationService.saveReservation(reservation);
                 _borrowHolding(user,holding);
+                return true;
             }
         } else if(holding.getStatus() == BookStatusEnum.AVAILABLE){
             _borrowHolding(user,holding);
+            return true;
         }
-        return true;
+        return false;
     }
 
     private void _borrowHolding(User user,Holding holding){
         BorrowRecord borrowRecord = new BorrowRecord();
         borrowRecord.setBook(holding);
-        borrowRecord.setAgent(adminRepository.findByUserId(UserUtil.getCurrentUserAccount()).get());
-        borrowRecord.setExtend(true);
-        borrowRecord.setMemo("");
+        var optionalAdmin=adminRepository.findByUserId(UserUtil.getCurrentUserAccount());
+        optionalAdmin.ifPresent(borrowRecord::setAgent);
+        borrowRecord.setExtend(false);
         borrowRecord.setBorrowTime(new Timestamp(new Date().getTime()));
-        borrowRecord.setLastReturnDate(new java.sql.Date(user.getGrade().getMaxBorrowTime()+new Date().getTime()));
-        borrowRecord.setLateFee(holding.getBook().getPrice());
+        borrowRecord.setLastReturnDate(new java.sql.Date((long) (user.getGrade().getMaxBorrowTime()) * 24 * 3600 * 1000
+                + new Date().getTime()));
+        borrowRecord.setLateFee(0.0);
+        borrowRecord.setUser(user);
         borrowRecordRepository.save(borrowRecord);
         holding.setStatus(BookStatusEnum.BORROWED);
+        holdingRepository.save(holding);
     }
 }

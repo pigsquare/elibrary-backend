@@ -5,5 +5,5 @@ import db2.elibrary.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Integer> {
-    Integer countBorrowRecordsByUserAndReturnTimeIsNull(User user);
+    Long countByUserAndReturnTimeIsNull(User user);
 }
