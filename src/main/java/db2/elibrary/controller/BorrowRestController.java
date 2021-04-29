@@ -36,7 +36,13 @@ public class BorrowRestController {
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     @PostMapping("/return/{barcode}")
     public CommonResponseDto returnBook(@PathVariable String barcode){
-        return null;
+        CommonResponseDto commonResponseDto = new CommonResponseDto();
+        if(borrowRecordService.returnHolding(barcode)){
+            commonResponseDto.setMessage("还书成功！");
+        } else{
+            commonResponseDto.setMessage("还书失败！");
+        }
+        return commonResponseDto;
     }
 
     // TODO: 续借
