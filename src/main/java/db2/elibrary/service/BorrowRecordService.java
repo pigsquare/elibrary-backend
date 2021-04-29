@@ -5,4 +5,6 @@ public interface BorrowRecordService {
     Boolean borrowHolding(String cardNo,String barcode);
     //还书
     Boolean returnHolding(String barcode);
+    //续借
+    Boolean renewHolding(Integer recordId);
 }

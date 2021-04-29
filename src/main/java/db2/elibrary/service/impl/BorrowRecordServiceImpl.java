@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -129,5 +130,22 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
             holding.setStatus(BookStatusEnum.RESERVED);
             holdingRepository.save(holding);
         }
+    }
+
+    @Override
+    public Boolean renewHolding(Integer recordId) {
+        Optional<BorrowRecord> borrowRecordOptional = borrowRecordRepository.findById(recordId);
+        if(borrowRecordOptional.isEmpty()){
+            throw new NotFoundException("借阅记录不存在");
+        }
+        BorrowRecord borrowRecord = borrowRecordOptional.get();
+        if(borrowRecord.getExtend()){
+            throw new AuthException("不可再次续借");
+        }
+        borrowRecord.setExtend(true);
+        borrowRecord.setLastReturnDate(new java.sql.Date((long) (borrowRecord.getUser().getGrade().getMaxBorrowTime()) * 24 * 3600 * 1000
+                + new Date().getTime()));
+        borrowRecordRepository.save(borrowRecord);
+        return true;
     }
 }

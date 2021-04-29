@@ -19,7 +19,7 @@ public class BorrowRestController {
     @Autowired
     public BorrowRestController(BorrowRecordService borrowRecordService){ this.borrowRecordService = borrowRecordService; }
 
-    // TODO: 借书
+
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     @PostMapping("/borrow")
     public CommonResponseDto borrowBook(@RequestBody BorrowBookRequestDto requestDto){
@@ -32,7 +32,6 @@ public class BorrowRestController {
         return commonResponseDto;
     }
 
-    // TODO: 还书
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     @PostMapping("/return/{barcode}")
     public CommonResponseDto returnBook(@PathVariable String barcode){
@@ -45,10 +44,15 @@ public class BorrowRestController {
         return commonResponseDto;
     }
 
-    // TODO: 续借
     @PostMapping("/renew/{recordId}")
-    public CommonResponseDto renewBook(@PathVariable String recordId){
-        return null;
+    public CommonResponseDto renewBook(@PathVariable Integer recordId){
+        CommonResponseDto commonResponseDto = new CommonResponseDto();
+        if(borrowRecordService.renewHolding(recordId)){
+            commonResponseDto.setMessage("续借成功！");
+        } else{
+            commonResponseDto.setMessage("续借失败！");
+        }
+        return commonResponseDto;
     }
 
     // TODO: 获取当前借书列表
