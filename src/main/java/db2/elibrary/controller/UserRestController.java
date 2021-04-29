@@ -57,7 +57,10 @@ public class UserRestController {
     // TODO: 生成并发送验证邮件
     @PostMapping("/update/mail")
     public CommonResponseDto submitEmail(@RequestBody MailAddRequestDto requestDto) throws IOException, TemplateException {
-        userService.sendMailVerify(requestDto.getEmail());
-        return null;
+        CommonResponseDto responseDto = new CommonResponseDto();
+        if(userService.sendMailVerify(requestDto.getEmail())){
+            responseDto.setMessage("验证邮件发送成功，请至邮箱查收！");
+        }
+        return responseDto;
     }
 }
