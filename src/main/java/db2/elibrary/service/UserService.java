@@ -19,4 +19,6 @@ public interface UserService {
     List<User> getAll();
     Boolean UpdateCardNo(String tel,String cardNo);
     Double getBalance(String tel) throws NotFoundException;
+    User getUserByCardNo(String cardNo);
+
 }

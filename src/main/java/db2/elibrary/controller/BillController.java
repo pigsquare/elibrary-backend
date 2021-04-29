@@ -13,7 +13,6 @@ import javax.validation.Valid;
 public class BillController {
     private UserService userService;
     public BillController(UserService userService){this.userService = userService;}
-    // TODO: 获取用户账户余额
     @GetMapping("/balance/{tel}")
     CommonResponseDto getBalance(@PathVariable String tel){
         CommonResponseDto commonResponseDto = new CommonResponseDto();

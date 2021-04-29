@@ -73,4 +73,12 @@ public class UserServiceImpl implements UserService {
         }
         return optionalUser.get();
     }
+
+    @Override
+    public User getUserByCardNo(String cardNo) {
+        Optional<User> userOptional = userRepository.findByCardNo(cardNo);
+        if(userOptional.isEmpty())
+            throw new NotFoundException("");
+        return userOptional.get();
+    }
 }
