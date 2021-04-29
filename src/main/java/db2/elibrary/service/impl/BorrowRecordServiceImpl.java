@@ -97,6 +97,7 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
 
         List<BorrowRecord> borrowRecordList = borrowRecordRepository.findByBook_BarcodeAndReturnTimeIsNullOrderByBorrowTimeDesc(barcode);
         if (borrowRecordList.isEmpty()) {
+            // TODO: 没有借出记录为什么要对holding进行处理
             processHoldingOfReturn(holding);
             throw new NotFoundException("没有借出记录");
         }
@@ -110,13 +111,6 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         borrowRecord.setReturnTime(new Timestamp(new Date().getTime()));
         borrowRecordRepository.save(borrowRecord);
         processHoldingOfReturn(holding);
-
-//        if(holding.getStatus()==BookStatusEnum.BORROWED){
-//            holding.setStatus(BookStatusEnum.AVAILABLE);
-//            holdingRepository.save(holding);
-//        } else if(holding.getStatus()==BookStatusEnum.BORROWED_AND_BOOKED){
-//            //TODO: 被预定，发邮件/短信通知预定者
-//        }
 
         return true;
     }
@@ -151,5 +145,12 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
                 + new Date().getTime()));
         borrowRecordRepository.save(borrowRecord);
         return true;
+    }
+
+    @Override
+    public List<BorrowRecord> getList() {
+        List<BorrowRecord> borrowRecordList;
+        borrowRecordList = borrowRecordRepository.findByUser_IdOrderByBorrowTimeDesc(UserUtil.getCurrentUserAccount());
+        return borrowRecordList;
     }
 }

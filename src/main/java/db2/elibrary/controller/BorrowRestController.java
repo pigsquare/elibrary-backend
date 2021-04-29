@@ -3,12 +3,14 @@ package db2.elibrary.controller;
 import db2.elibrary.dto.BorrowBookRequestDto;
 import db2.elibrary.dto.BorrowRecordResponseDto;
 import db2.elibrary.dto.CommonResponseDto;
+import db2.elibrary.entity.BorrowRecord;
 import db2.elibrary.service.BorrowRecordService;
 import db2.elibrary.service.HoldingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -55,10 +57,14 @@ public class BorrowRestController {
         return commonResponseDto;
     }
 
-    // TODO: 获取当前借书列表
     @GetMapping("/list")
     public List<BorrowRecordResponseDto> getList(){
-        return null;
+        List<BorrowRecordResponseDto> borrowRecordResponseDtoList = new ArrayList<>();
+        List<BorrowRecord> borrowRecordList = borrowRecordService.getList();
+        for(BorrowRecord borrowRecord:borrowRecordList){
+            borrowRecordResponseDtoList.add(new BorrowRecordResponseDto(borrowRecord));
+        }
+        return borrowRecordResponseDtoList;
     }
 
     // TODO: 获取当前未还的借书列表

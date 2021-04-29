@@ -10,4 +10,6 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Inte
     Integer countBorrowRecordsByUserAndReturnTimeIsNull(User user);
     List<BorrowRecord> findByBook_BarcodeAndReturnTimeIsNullOrderByBorrowTimeDesc(String barcode);
     Long countByUserAndReturnTimeIsNull(User user);
+    List<BorrowRecord> findByUser_IdOrderByBorrowTimeDesc(String userId);
+    List<BorrowRecord> findByUser_IdAndReturnTimeIsNullOrderByBorrowTimeDesc(String userId);
 }
