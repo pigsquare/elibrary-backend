@@ -96,6 +96,7 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
 
         List<BorrowRecord> borrowRecordList = borrowRecordRepository.findByBook_BarcodeAndOrderByBorrowTimeDesc(barcode);
         if(borrowRecordList.isEmpty()){
+            processHoldingOfReturn(holding);
             throw new NotFoundException("没有借出记录");
         }
         BorrowRecord borrowRecord = borrowRecordList.get(0);
@@ -107,13 +108,26 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         userService.updateUser(user);
         borrowRecord.setReturnTime(new Timestamp(new Date().getTime()));
         borrowRecordRepository.save(borrowRecord);
+        processHoldingOfReturn(holding);
 
-        if(holding.getStatus()==BookStatusEnum.BORROWED){
-            holding.setStatus(BookStatusEnum.AVAILABLE);
-        } else if(holding.getStatus()==BookStatusEnum.BORROWED_AND_BOOKED){
-            //TODO: 被预定，发邮件/短信通知预定者
-        }
+//        if(holding.getStatus()==BookStatusEnum.BORROWED){
+//            holding.setStatus(BookStatusEnum.AVAILABLE);
+//            holdingRepository.save(holding);
+//        } else if(holding.getStatus()==BookStatusEnum.BORROWED_AND_BOOKED){
+//            //TODO: 被预定，发邮件/短信通知预定者
+//        }
 
         return true;
+    }
+
+    private void processHoldingOfReturn(Holding holding){
+        if(holding.getStatus()==BookStatusEnum.BORROWED){
+            holding.setStatus(BookStatusEnum.AVAILABLE);
+            holdingRepository.save(holding);
+        } else if(holding.getStatus()==BookStatusEnum.BORROWED_AND_BOOKED){
+            //TODO: 被预定，发邮件/短信通知预定者
+            holding.setStatus(BookStatusEnum.RESERVED);
+            holdingRepository.save(holding);
+        }
     }
 }
