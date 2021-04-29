@@ -3,10 +3,12 @@ package db2.elibrary.controller;
 import db2.elibrary.dto.*;
 import db2.elibrary.entity.User;
 import db2.elibrary.service.UserService;
+import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -54,7 +56,8 @@ public class UserRestController {
 
     // TODO: 生成并发送验证邮件
     @PostMapping("/update/mail")
-    public CommonResponseDto submitEmail(@RequestBody MailAddRequestDto requestDto){
+    public CommonResponseDto submitEmail(@RequestBody MailAddRequestDto requestDto) throws IOException, TemplateException {
+        userService.sendMailVerify(requestDto.getEmail());
         return null;
     }
 }
