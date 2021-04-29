@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/borrow")
 public class BorrowRestController {
-    private BorrowRecordService borrowRecordService;
+    private final BorrowRecordService borrowRecordService;
 
     @Autowired
     public BorrowRestController(BorrowRecordService borrowRecordService){ this.borrowRecordService = borrowRecordService; }

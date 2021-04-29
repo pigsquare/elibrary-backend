@@ -24,12 +24,12 @@ import java.util.List;
 @Service
 @Slf4j
 public class BorrowRecordServiceImpl implements BorrowRecordService {
-    private BorrowRecordRepository borrowRecordRepository;
-    private HoldingService holdingService;
-    private ReservationService reservationService;
-    private UserService userService;
-    private AdminRepository adminRepository;
-    private HoldingRepository holdingRepository;
+    private final BorrowRecordRepository borrowRecordRepository;
+    private final HoldingService holdingService;
+    private final ReservationService reservationService;
+    private final UserService userService;
+    private final AdminRepository adminRepository;
+    private final HoldingRepository holdingRepository;
 
     @Autowired
     public BorrowRecordServiceImpl(BorrowRecordRepository borrowRecordRepository, HoldingService holdingService, ReservationService reservationService, UserService userService, AdminRepository adminRepository, HoldingRepository holdingRepository) {
@@ -94,7 +94,7 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
             throw new NotFoundException("");
         }
 
-        List<BorrowRecord> borrowRecordList = borrowRecordRepository.findByBook_BarcodeAndOrderByBorrowTimeDesc(barcode);
+        List<BorrowRecord> borrowRecordList = borrowRecordRepository.findByBook_BarcodeAndReturnTimeIsNullOrderByBorrowTimeDesc(barcode);
         if(borrowRecordList.isEmpty()){
             processHoldingOfReturn(holding);
             throw new NotFoundException("没有借出记录");

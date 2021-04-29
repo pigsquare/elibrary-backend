@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Integer> {
     Integer countBorrowRecordsByUserAndReturnTimeIsNull(User user);
-    List<BorrowRecord> findByBook_BarcodeAndOrderByBorrowTimeDesc(String barcode);
+    List<BorrowRecord> findByBook_BarcodeAndReturnTimeIsNullOrderByBorrowTimeDesc(String barcode);
     Long countByUserAndReturnTimeIsNull(User user);
 }
