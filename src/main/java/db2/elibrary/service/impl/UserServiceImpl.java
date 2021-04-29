@@ -1,26 +1,39 @@
 package db2.elibrary.service.impl;
 
 import db2.elibrary.entity.User;
-import db2.elibrary.exception.AuthException;
 import db2.elibrary.exception.NotFoundException;
 import db2.elibrary.repository.UserRepository;
+import db2.elibrary.service.MailService;
 import db2.elibrary.service.UserService;
+import db2.elibrary.util.JwtUtil;
 import db2.elibrary.util.UserUtil;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.*;
 
 @Service("user_service")
 public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
+    private MailService mailService;
+    private JwtUtil jwtUtil;
+    private FreeMarkerConfigurer freeMarkerConfigurer;
+    private JavaMailSender mailSender;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, MailService mailService, JwtUtil jwtUtil, FreeMarkerConfigurer freeMarkerConfigurer, JavaMailSender mailSender) {
         this.userRepository = userRepository;
+        this.mailService = mailService;
+        this.jwtUtil = jwtUtil;
+        this.freeMarkerConfigurer = freeMarkerConfigurer;
+        this.mailSender = mailSender;
     }
 
     @Override
@@ -37,6 +50,28 @@ public class UserServiceImpl implements UserService {
         }
 
         return false;
+    }
+
+    @Override
+    public Boolean sendMailVerify(String mailAddr) throws IOException, TemplateException {
+        // 部署地址
+        String tempUrl = "http://localhost:4200/verify/";
+        String userId = UserUtil.getCurrentUserAccount();
+        if(userId == null){
+            throw new NotFoundException("");
+        }
+        User user = userRepository.getOne(userId);
+        String jwt = jwtUtil.generateEmailValidationToken(user, mailAddr);
+        Map<String, Object> mailModel = new HashMap<>();
+        mailModel.put("name", user.getName());
+        mailModel.put("url", tempUrl + jwt);
+        Calendar date = Calendar.getInstance();
+        String year = String.valueOf(date.get(Calendar.YEAR));
+        mailModel.put("year", year);
+        Template template = freeMarkerConfigurer.getConfiguration().getTemplate("activation_email.xhtml");
+        String mailText = FreeMarkerTemplateUtils.processTemplateIntoString(template, mailModel);
+        mailService.sendHtmlMail(mailAddr, "No reply - Validate your email account", mailText, mailSender);
+        return true;
     }
 
     @Override
