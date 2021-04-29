@@ -46,8 +46,8 @@ public class BorrowRestController {
     }
 
     // TODO: 续借
-    @PostMapping("/renew/{bookId}")
-    public CommonResponseDto renewBook(@PathVariable String bookId){
+    @PostMapping("/renew/{recordId}")
+    public CommonResponseDto renewBook(@PathVariable String recordId){
         return null;
     }
 
