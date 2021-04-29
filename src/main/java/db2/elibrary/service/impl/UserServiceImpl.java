@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service("user_service")
@@ -64,4 +65,12 @@ public class UserServiceImpl implements UserService {
         return user.getBalance();
     }
 
+    @Override
+    public User getProfile() {
+        Optional<User> optionalUser = userRepository.findById(Objects.requireNonNull(UserUtil.getCurrentUserAccount()));
+        if(optionalUser.isEmpty()) {
+            throw new NotFoundException("查询失败！");
+        }
+        return optionalUser.get();
+    }
 }

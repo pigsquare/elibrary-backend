@@ -13,7 +13,7 @@ public interface UserService {
 //    Boolean sendMailVerify(String mailAddr);
 //    Boolean unableUser(String userInfo);
 //    String  delUser(String id);
-//    User getProfile();
+    User getProfile();
 //    Boolean verifyEmail(String token);
 //    Boolean prepay(Double amount);
     List<User> getAll();
