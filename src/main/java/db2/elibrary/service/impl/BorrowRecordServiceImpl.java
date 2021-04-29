@@ -4,6 +4,7 @@ import db2.elibrary.entity.*;
 import db2.elibrary.entity.enums.BookStatusEnum;
 import db2.elibrary.entity.enums.ReserveStatusEnum;
 import db2.elibrary.exception.AuthException;
+import db2.elibrary.exception.NotFoundException;
 import db2.elibrary.repository.AdminRepository;
 import db2.elibrary.repository.BorrowRecordRepository;
 import db2.elibrary.repository.HoldingRepository;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -83,5 +85,35 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         borrowRecordRepository.save(borrowRecord);
         holding.setStatus(BookStatusEnum.BORROWED);
         holdingRepository.save(holding);
+    }
+
+    @Override
+    public Boolean returnHolding(String barcode) {
+        Holding holding = holdingService.getHoldingByBarcode(barcode);
+        if(holding == null){
+            throw new NotFoundException("");
+        }
+
+        List<BorrowRecord> borrowRecordList = borrowRecordRepository.findByBook_BarcodeAndOrderByBorrowTimeDesc(barcode);
+        if(borrowRecordList.isEmpty()){
+            throw new NotFoundException("没有借出记录");
+        }
+        BorrowRecord borrowRecord = borrowRecordList.get(0);
+        User user = borrowRecord.getUser();
+        if(borrowRecord.getLastReturnDate().compareTo(new Date()) > 0){
+            user.setBalance(user.getBalance()-borrowRecord.getLateFee());
+        }
+        user.setCredit(user.getCredit()+1);
+        userService.updateUser(user);
+        borrowRecord.setReturnTime(new Timestamp(new Date().getTime()));
+        borrowRecordRepository.save(borrowRecord);
+
+        if(holding.getStatus()==BookStatusEnum.BORROWED){
+            holding.setStatus(BookStatusEnum.AVAILABLE);
+        } else if(holding.getStatus()==BookStatusEnum.BORROWED_AND_BOOKED){
+            //TODO: 被预定，发邮件/短信通知预定者
+        }
+
+        return true;
     }
 }

@@ -11,7 +11,7 @@ import java.util.List;
 public interface UserService {
     Boolean changePassword(String oldPassword, String newPassword);
 //    Boolean updateUsername(String username);
-//    User updateUserProfile();
+    void updateUser(User user);
     Boolean sendMailVerify(String mailAddr) throws IOException, TemplateException;
 //    Boolean unableUser(String userInfo);
 //    String  delUser(String id);

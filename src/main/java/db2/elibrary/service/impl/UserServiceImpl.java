@@ -116,4 +116,9 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("");
         return userOptional.get();
     }
+
+    @Override
+    public void updateUser(User user) {
+        userRepository.save(user);
+    }
 }
