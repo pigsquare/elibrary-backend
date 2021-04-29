@@ -28,11 +28,12 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
     private AdminRepository adminRepository;
 
     @Autowired
-    public BorrowRecordServiceImpl(BorrowRecordRepository borrowRecordRepository, HoldingService holdingService, ReservationService reservationService, UserService userService) {
+    public BorrowRecordServiceImpl(BorrowRecordRepository borrowRecordRepository, HoldingService holdingService, ReservationService reservationService, UserService userService, AdminRepository adminRepository) {
         this.borrowRecordRepository = borrowRecordRepository;
         this.holdingService = holdingService;
         this.reservationService = reservationService;
         this.userService = userService;
+        this.adminRepository = adminRepository;
     }
 
     @Override
@@ -69,8 +70,7 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         borrowRecord.setExtend(true);
         borrowRecord.setMemo("");
         borrowRecord.setBorrowTime(new Timestamp(new Date().getTime()));
-        Timestamp returnTimestamp = new Timestamp(user.getGrade().getMaxBorrowTime()+new Date().getTime());
-        borrowRecord.setLastReturnDate(new java.sql.Date(returnTimestamp.getTime()));
+        borrowRecord.setLastReturnDate(new java.sql.Date(user.getGrade().getMaxBorrowTime()+new Date().getTime()));
         borrowRecord.setLateFee(holding.getBook().getPrice());
         borrowRecordRepository.save(borrowRecord);
         holding.setStatus(BookStatusEnum.BORROWED);
