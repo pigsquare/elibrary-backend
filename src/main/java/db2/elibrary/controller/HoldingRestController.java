@@ -3,10 +3,12 @@ package db2.elibrary.controller;
 import db2.elibrary.dto.CommonResponseDto;
 import db2.elibrary.dto.HoldingAddRequestDto;
 import db2.elibrary.dto.HoldingInfoResponseDto;
+import db2.elibrary.dto.HoldingUpdateRequestDto;
 import db2.elibrary.service.HoldingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -27,7 +29,7 @@ public class HoldingRestController {
     }
 
     @PostMapping("/add")
-    public CommonResponseDto addHolding(@RequestBody HoldingAddRequestDto requestDto){
+    public CommonResponseDto addHolding(@RequestBody @Valid HoldingAddRequestDto requestDto){
         CommonResponseDto responseDto = new CommonResponseDto();
         responseDto.setArgs(holdingService.addHolding(requestDto));
         return responseDto;
@@ -38,4 +40,11 @@ public class HoldingRestController {
         return holdingService.getHoldingsByIsbn(isbn);
     }
 
+    // TODO: update book status
+    @PostMapping("/update")
+    public CommonResponseDto updateHolding(@RequestBody @Valid HoldingUpdateRequestDto requestDto){
+        CommonResponseDto responseDto = new CommonResponseDto();
+        responseDto.setArgs(null);
+        return responseDto;
+    }
 }
