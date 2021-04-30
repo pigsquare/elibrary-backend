@@ -9,6 +9,7 @@ public class BorrowRecordResponseDto {
     private String bookName;
     private String author;
     private String publisher;
+    private String barcode;
 
     private String borrowTime;
     private String lastReturnDate;
@@ -31,5 +32,6 @@ public class BorrowRecordResponseDto {
             this.returnTime = borrowRecord.getReturnTime().toString();
         this.lateFee = borrowRecord.getLateFee();
         this.memo = borrowRecord.getMemo();
+        this.barcode = borrowRecord.getBook().getBarcode();
     }
 }
