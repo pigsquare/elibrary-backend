@@ -76,4 +76,16 @@ public class BorrowRestController {
         }
         return borrowRecordResponseDtoList;
     }
+
+    // 根据读者卡号获取当前正在借阅图书
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
+    @GetMapping("/list/{card}")
+    public List<BorrowRecordResponseDto> getBorrowingListByCard(@PathVariable String card){
+        List<BorrowRecordResponseDto> borrowRecordResponseDtoList = new ArrayList<>();
+        List<BorrowRecord> borrowRecords = borrowRecordService.getBorrowingListByCardNo(card);
+        for(BorrowRecord borrowRecord:borrowRecords){
+            borrowRecordResponseDtoList.add(new BorrowRecordResponseDto(borrowRecord));
+        }
+        return borrowRecordResponseDtoList;
+    }
 }

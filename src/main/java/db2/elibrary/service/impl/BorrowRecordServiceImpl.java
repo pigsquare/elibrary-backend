@@ -165,4 +165,10 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         borrowRecordList = borrowRecordRepository.findByUser_IdAndReturnTimeIsNullOrderByBorrowTimeDesc(UserUtil.getCurrentUserAccount());
         return borrowRecordList;
     }
+
+    @Override
+    public List<BorrowRecord> getBorrowingListByCardNo(String cardNo) {
+        User user = userService.getUserByCardNo(cardNo);
+        return borrowRecordRepository.findByUser_IdAndReturnTimeIsNullOrderByBorrowTimeDesc(user.getId());
+    }
 }

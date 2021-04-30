@@ -15,4 +15,6 @@ public interface BorrowRecordService {
     List<BorrowRecord> getList();
     //获取当前用户借书未还列表
     List<BorrowRecord> getBorrowingList();
+    //根据卡号获取当前用户借书未还列表
+    List<BorrowRecord> getBorrowingListByCardNo(String cardNo);
 }
