@@ -1,9 +1,9 @@
 package db2.elibrary.service.impl;
 
-import db2.elibrary.dto.AddUserTestDto;
-import db2.elibrary.dto.AuthTokenRequestDto;
-import db2.elibrary.dto.AuthTokenResponseDto;
-import db2.elibrary.dto.ValidateByTelRequestDto;
+import db2.elibrary.dto.auth.AddUserTestDto;
+import db2.elibrary.dto.auth.AuthTokenRequestDto;
+import db2.elibrary.dto.auth.AuthTokenResponseDto;
+import db2.elibrary.dto.auth.ValidateByTelRequestDto;
 import db2.elibrary.entity.PendingRegisterUser;
 import db2.elibrary.entity.User;
 import db2.elibrary.entity.enums.RoleEnum;

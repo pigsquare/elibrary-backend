@@ -1,7 +1,7 @@
 package db2.elibrary.controller;
 
-import db2.elibrary.dto.BookInfoResponseDto;
-import db2.elibrary.dto.UpdateBookRequestDto;
+import db2.elibrary.dto.book.BookInfoResponseDto;
+import db2.elibrary.dto.book.UpdateBookRequestDto;
 import db2.elibrary.entity.Book;
 import db2.elibrary.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;

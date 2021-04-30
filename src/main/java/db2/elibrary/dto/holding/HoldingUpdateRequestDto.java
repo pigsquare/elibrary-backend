@@ -1,4 +1,4 @@
-package db2.elibrary.dto;
+package db2.elibrary.dto.holding;
 
 import lombok.Data;
 
@@ -6,11 +6,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class LibraryCardRequestDto {
+public class HoldingUpdateRequestDto {
     @NotNull
     @NotBlank
-    private String tel;
-    @NotNull
-    @NotBlank
-    private String cardNo;
+    private String barcode;
+
+    private String status = "AVAILABLE";
 }

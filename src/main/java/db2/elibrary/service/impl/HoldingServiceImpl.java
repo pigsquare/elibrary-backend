@@ -1,7 +1,7 @@
 package db2.elibrary.service.impl;
 
-import db2.elibrary.dto.HoldingAddRequestDto;
-import db2.elibrary.dto.HoldingInfoResponseDto;
+import db2.elibrary.dto.holding.HoldingAddRequestDto;
+import db2.elibrary.dto.holding.HoldingInfoResponseDto;
 import db2.elibrary.entity.Admin;
 import db2.elibrary.entity.Holding;
 import db2.elibrary.entity.enums.BookStatusEnum;

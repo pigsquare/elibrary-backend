@@ -1,4 +1,4 @@
-package db2.elibrary.dto;
+package db2.elibrary.dto.borrow;
 
 import lombok.Data;
 
@@ -6,12 +6,11 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class PayRequestDto {
+public class BorrowBookRequestDto {
+    @NotNull
+    @NotBlank
+    private String cardNo;
     @NotNull
     @NotBlank
     private String barcode;
-    @NotNull
-    @NotBlank
-    private String tel;
-    private Double total;
 }

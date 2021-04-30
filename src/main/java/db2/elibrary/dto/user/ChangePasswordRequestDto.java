@@ -1,4 +1,4 @@
-package db2.elibrary.dto;
+package db2.elibrary.dto.user;
 
 import lombok.Data;
 
@@ -6,11 +6,11 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class AddUserTestDto {
+public class ChangePasswordRequestDto {
     @NotNull
     @NotBlank
-    private String username;
+    private String oldPassword;
     @NotNull
     @NotBlank
-    private String password;
+    private String newPassword;
 }

@@ -1,4 +1,4 @@
-package db2.elibrary.dto;
+package db2.elibrary.dto.borrow;
 
 import db2.elibrary.entity.BorrowRecord;
 import lombok.Data;

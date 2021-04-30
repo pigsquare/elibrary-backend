@@ -1,9 +1,9 @@
 package db2.elibrary.controller;
 
-import db2.elibrary.dto.BookInfoResponseDto;
-import db2.elibrary.dto.BookSearchRequestDto;
-import db2.elibrary.dto.HoldingInfoResponseDto;
-import db2.elibrary.dto.IsbnInfoResponseDto;
+import db2.elibrary.dto.book.BookInfoResponseDto;
+import db2.elibrary.dto.book.BookSearchRequestDto;
+import db2.elibrary.dto.holding.HoldingInfoResponseDto;
+import db2.elibrary.dto.book.IsbnInfoResponseDto;
 import db2.elibrary.service.BookService;
 import db2.elibrary.service.HoldingService;
 import db2.elibrary.util.crawler.HttpUtilDownPage;

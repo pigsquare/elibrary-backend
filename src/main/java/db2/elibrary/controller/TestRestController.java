@@ -1,8 +1,8 @@
 package db2.elibrary.controller;
 
 import com.alipay.api.AlipayApiException;
-import db2.elibrary.dto.AddUserTestDto;
-import db2.elibrary.dto.IsbnInfoResponseDto;
+import db2.elibrary.dto.auth.AddUserTestDto;
+import db2.elibrary.dto.book.IsbnInfoResponseDto;
 import db2.elibrary.entity.User;
 import db2.elibrary.service.AuthService;
 import db2.elibrary.service.HoldingService;
@@ -10,7 +10,6 @@ import db2.elibrary.service.MailService;
 import db2.elibrary.service.SmsService;
 import db2.elibrary.util.AliPayUtil;
 import db2.elibrary.util.crawler.HttpUtilDownPage;
-import org.checkerframework.checker.units.qual.A;
 import org.htmlcleaner.XPatherException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;

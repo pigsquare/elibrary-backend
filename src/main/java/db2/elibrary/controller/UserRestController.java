@@ -1,6 +1,10 @@
 package db2.elibrary.controller;
 
 import db2.elibrary.dto.*;
+import db2.elibrary.dto.user.ChangePasswordRequestDto;
+import db2.elibrary.dto.user.LibraryCardRequestDto;
+import db2.elibrary.dto.user.MailAddRequestDto;
+import db2.elibrary.dto.user.UserProfileResponseDto;
 import db2.elibrary.entity.User;
 import db2.elibrary.service.UserService;
 import freemarker.template.TemplateException;

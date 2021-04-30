@@ -1,4 +1,4 @@
-package db2.elibrary.dto;
+package db2.elibrary.dto.book;
 
 import db2.elibrary.entity.Book;
 import lombok.Data;

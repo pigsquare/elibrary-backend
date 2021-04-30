@@ -1,4 +1,4 @@
-package db2.elibrary.dto;
+package db2.elibrary.dto.auth;
 
 import lombok.Data;
 
@@ -6,11 +6,11 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class BorrowBookRequestDto {
+public class AuthTokenRequestDto {
     @NotNull
     @NotBlank
-    private String cardNo;
+    private String username;
     @NotNull
     @NotBlank
-    private String barcode;
+    private String password;
 }

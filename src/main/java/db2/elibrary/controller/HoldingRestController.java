@@ -1,9 +1,9 @@
 package db2.elibrary.controller;
 
 import db2.elibrary.dto.CommonResponseDto;
-import db2.elibrary.dto.HoldingAddRequestDto;
-import db2.elibrary.dto.HoldingInfoResponseDto;
-import db2.elibrary.dto.HoldingUpdateRequestDto;
+import db2.elibrary.dto.holding.HoldingAddRequestDto;
+import db2.elibrary.dto.holding.HoldingInfoResponseDto;
+import db2.elibrary.dto.holding.HoldingUpdateRequestDto;
 import db2.elibrary.service.HoldingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
