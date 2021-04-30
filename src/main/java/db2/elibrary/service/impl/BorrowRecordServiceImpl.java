@@ -97,16 +97,18 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
 
         List<BorrowRecord> borrowRecordList = borrowRecordRepository.findByBook_BarcodeAndReturnTimeIsNullOrderByBorrowTimeDesc(barcode);
         if (borrowRecordList.isEmpty()) {
-            // TODO: 没有借出记录为什么要对holding进行处理
+            // 该处理只针对holding，检查修改holding的状态
             processHoldingOfReturn(holding);
             throw new NotFoundException("没有借出记录");
         }
         BorrowRecord borrowRecord = borrowRecordList.get(0);
         User user = borrowRecord.getUser();
         if (borrowRecord.getLastReturnDate().compareTo(new Date()) > 0) {
-            user.setBalance(user.getBalance() - borrowRecord.getLateFee());
+            // user.setBalance(user.getBalance() - borrowRecord.getLateFee());
+            // 如果超时归还，不加信用分
+            user.setCredit(user.getCredit() - 5);
         }
-        user.setCredit(user.getCredit() + 1);
+        user.setCredit(user.getCredit() + 5);
         userService.updateUser(user);
         borrowRecord.setReturnTime(new Timestamp(new Date().getTime()));
         borrowRecordRepository.save(borrowRecord);
@@ -133,7 +135,7 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
             throw new NotFoundException("借阅记录不存在");
         }
         BorrowRecord borrowRecord = borrowRecordOptional.get();
-        if (borrowRecord.getExtend() || borrowRecord.getReturnTime() != null) {
+        if (borrowRecord.getExtend() || borrowRecord.getReturnTime() != null || borrowRecord.getLateFee() > 0) {
             throw new AuthException("不可再次续借");
         }
         if (!borrowRecord.getUser().getId().equals(UserUtil.getCurrentUserAccount())){
