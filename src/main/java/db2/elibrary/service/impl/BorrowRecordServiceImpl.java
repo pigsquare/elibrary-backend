@@ -133,8 +133,11 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
             throw new NotFoundException("借阅记录不存在");
         }
         BorrowRecord borrowRecord = borrowRecordOptional.get();
-        if (borrowRecord.getExtend()) {
+        if (borrowRecord.getExtend() || borrowRecord.getReturnTime() != null) {
             throw new AuthException("不可再次续借");
+        }
+        if (!borrowRecord.getUser().getId().equals(UserUtil.getCurrentUserAccount())){
+            throw new AuthException("用户错误，无权续借");
         }
 
         if (borrowRecord.getUser().getBalance() < 0) {

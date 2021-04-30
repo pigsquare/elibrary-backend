@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class BorrowRestController {
 
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     @PostMapping("/borrow")
-    public CommonResponseDto borrowBook(@RequestBody BorrowBookRequestDto requestDto){
+    public CommonResponseDto borrowBook(@RequestBody @Valid BorrowBookRequestDto requestDto){
         CommonResponseDto commonResponseDto = new CommonResponseDto();
         if(borrowRecordService.borrowHolding(requestDto.getCardNo(),requestDto.getBarcode())){
             commonResponseDto.setMessage("借书成功！");
