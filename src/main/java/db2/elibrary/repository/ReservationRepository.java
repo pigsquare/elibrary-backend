@@ -19,5 +19,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     // 获取某本书的预约列表
     List<Reservation> findByBookInfo_IsbnAndCompleteIsFalseOrderBySubmitTime(String isbn);
     // 获取这个人有没有正在预约某本书
-    List<Reservation> findByUserIdAndBookInfo_IsbnAndCompleteIsFalse(String userId, String isbn);
+    List<Reservation> findByUserIdAndBookInfo_IsbnAndBookIsNull(String userId, String isbn);
 }
