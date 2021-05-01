@@ -21,6 +21,9 @@ public class Reservation {
     @ManyToOne
     private Holding book;
 
+    @ManyToOne
+    private Book bookInfo;
+
     private Timestamp submitTime;
 
     private Date lastDate;
