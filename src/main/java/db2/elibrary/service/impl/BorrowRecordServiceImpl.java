@@ -8,10 +8,8 @@ import db2.elibrary.exception.NotFoundException;
 import db2.elibrary.repository.AdminRepository;
 import db2.elibrary.repository.BorrowRecordRepository;
 import db2.elibrary.repository.HoldingRepository;
-import db2.elibrary.service.BorrowRecordService;
-import db2.elibrary.service.HoldingService;
-import db2.elibrary.service.ReservationService;
-import db2.elibrary.service.UserService;
+import db2.elibrary.repository.ReservationRepository;
+import db2.elibrary.service.*;
 import db2.elibrary.util.UserUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,15 +29,19 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
     private final UserService userService;
     private final AdminRepository adminRepository;
     private final HoldingRepository holdingRepository;
+    private final ReservationRepository reservationRepository;
+    private final SmsService smsService;
 
     @Autowired
-    public BorrowRecordServiceImpl(BorrowRecordRepository borrowRecordRepository, HoldingService holdingService, ReservationService reservationService, UserService userService, AdminRepository adminRepository, HoldingRepository holdingRepository) {
+    public BorrowRecordServiceImpl(BorrowRecordRepository borrowRecordRepository, HoldingService holdingService, ReservationService reservationService, UserService userService, AdminRepository adminRepository, HoldingRepository holdingRepository, ReservationRepository reservationRepository, SmsService smsService) {
         this.borrowRecordRepository = borrowRecordRepository;
         this.holdingService = holdingService;
         this.reservationService = reservationService;
         this.userService = userService;
         this.adminRepository = adminRepository;
         this.holdingRepository = holdingRepository;
+        this.reservationRepository = reservationRepository;
+        this.smsService = smsService;
     }
 
     @Override
@@ -120,10 +122,24 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
     private void processHoldingOfReturn(Holding holding) {
         if (holding.getStatus() == BookStatusEnum.BORROWED) {
             holding.setStatus(BookStatusEnum.AVAILABLE);
-            holdingRepository.save(holding);
-        } else if (holding.getStatus() == BookStatusEnum.BORROWED_AND_BOOKED) {
-            //TODO: 被预定，发邮件/短信通知预定者
-            holding.setStatus(BookStatusEnum.RESERVED);
+
+            var reservationList=reservationRepository.findByBookInfo_IsbnAndBookIsNullOrderBySubmitTime(holding.getBook().getIsbn());
+            if (!reservationList.isEmpty()){
+                var reservation = reservationList.get(0);
+                holding.setStatus(BookStatusEnum.RESERVED);
+                reservation.setBook(holding);
+                reservation.setStatus(ReserveStatusEnum.RESERVED);
+                reservation.setLastDate(new java.sql.Date((long) (reservation.getUser().getGrade().getMaxReserveTime())
+                        * 24 * 3600 * 1000 + new Date().getTime()));
+                reservationRepository.save(reservation);
+                //TODO: 被预定，发邮件/短信通知预定者
+                String bookName = reservation.getBookInfo().getName();
+                smsService.sendReservationSuccessSms(reservation.getUser().getTel(),
+                        "《" + bookName.substring(0, Math.min(bookName.length(), 10)) + "》",
+                        new java.sql.Date(System.currentTimeMillis()).toString(),
+                        reservation.getUser().getGrade().getMaxReserveTime(),
+                        reservation.getLastDate().toString());
+            }
             holdingRepository.save(holding);
         }
     }
