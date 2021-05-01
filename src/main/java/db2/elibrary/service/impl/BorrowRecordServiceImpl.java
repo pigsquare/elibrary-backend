@@ -136,7 +136,7 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
                 String bookName = reservation.getBookInfo().getName();
                 smsService.sendReservationSuccessSms(reservation.getUser().getTel(),
                         "《" + bookName.substring(0, Math.min(bookName.length(), 10)) + "》",
-                        new java.sql.Date(System.currentTimeMillis()).toString(),
+                        new java.sql.Date(reservation.getSubmitTime().getTime()).toString(),
                         reservation.getUser().getGrade().getMaxReserveTime(),
                         reservation.getLastDate().toString());
             }
