@@ -131,6 +131,7 @@ public class AuthServiceImpl implements AuthService {
                 newUser.setUsername(username);
                 newUser.setName("用户" + username);
                 newUser.setUnencodedPassword(password);
+                // TODO: 设置等级1
                 userRepository.save(newUser);
                 pendingRegisterUserRepository.delete(pendingRegisterUser.get());
                 return true;

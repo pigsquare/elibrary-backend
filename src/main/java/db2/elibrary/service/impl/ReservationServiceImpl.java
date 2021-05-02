@@ -47,7 +47,7 @@ public class ReservationServiceImpl implements ReservationService {
     public String  makeReservation(String isbn) {
         String res = "预约错误，请检查输入是否有误！";
         String userId = UserUtil.getCurrentUserAccount();
-        // TODO: 1.用户是否合法；2.判断用户已经借出的书目+未完成预约的总数是否大于user.grade.max_holdings; 3.书是否存在
+        // TODO: 1.用户是否合法；2.判断用户已经借出的书目+未完成预约的总数是否大于user.grade.max_holdings; 3.书是否存在； 4.读者是否有其他的正在借而且超期的图书
         User user = userRepository.findById(userId).get();  // FIXME: 有空指针问题
         // 这是未完成预约数量
         Integer reservationNum = reservationRepository.findByUserIdAndCompleteIsFalseOrderBySubmitTimeDesc(userId).size();

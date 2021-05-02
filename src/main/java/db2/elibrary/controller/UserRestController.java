@@ -58,7 +58,7 @@ public class UserRestController {
         return new UserProfileResponseDto(user);
     }
 
-    // TODO: 生成并发送验证邮件
+    // 生成并发送验证邮件
     @PostMapping("/update/mail")
     public CommonResponseDto submitEmail(@RequestBody MailAddRequestDto requestDto) throws IOException, TemplateException {
         CommonResponseDto responseDto = new CommonResponseDto();
@@ -67,4 +67,6 @@ public class UserRestController {
         }
         return responseDto;
     }
+
+    // TODO: 用户名修改、等级设置
 }
