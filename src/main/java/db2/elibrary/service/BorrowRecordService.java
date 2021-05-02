@@ -1,7 +1,9 @@
 package db2.elibrary.service;
 
 import db2.elibrary.entity.BorrowRecord;
+import freemarker.template.TemplateException;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface BorrowRecordService {

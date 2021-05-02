@@ -1,6 +1,9 @@
 package db2.elibrary.service.impl;
 
-import db2.elibrary.entity.*;
+import db2.elibrary.entity.BorrowRecord;
+import db2.elibrary.entity.Holding;
+import db2.elibrary.entity.Reservation;
+import db2.elibrary.entity.User;
 import db2.elibrary.entity.enums.BookStatusEnum;
 import db2.elibrary.entity.enums.ReserveStatusEnum;
 import db2.elibrary.exception.AuthException;
@@ -31,9 +34,10 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
     private final HoldingRepository holdingRepository;
     private final ReservationRepository reservationRepository;
     private final SmsService smsService;
+    private final MailService mailService;
 
     @Autowired
-    public BorrowRecordServiceImpl(BorrowRecordRepository borrowRecordRepository, HoldingService holdingService, ReservationService reservationService, UserService userService, AdminRepository adminRepository, HoldingRepository holdingRepository, ReservationRepository reservationRepository, SmsService smsService) {
+    public BorrowRecordServiceImpl(BorrowRecordRepository borrowRecordRepository, HoldingService holdingService, ReservationService reservationService, UserService userService, AdminRepository adminRepository, HoldingRepository holdingRepository, ReservationRepository reservationRepository, SmsService smsService, MailService mailService) {
         this.borrowRecordRepository = borrowRecordRepository;
         this.holdingService = holdingService;
         this.reservationService = reservationService;
@@ -42,6 +46,7 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         this.holdingRepository = holdingRepository;
         this.reservationRepository = reservationRepository;
         this.smsService = smsService;
+        this.mailService = mailService;
     }
 
     @Override
@@ -50,6 +55,9 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         User user = userService.getUserByCardNo(cardNo);
         if (user.getBalance() < 0)
             throw new AuthException("账户余额不足，请及时缴费！");
+        //是否有逾期未还图书
+        if(borrowRecordRepository.countByUserAndReturnTimeIsNullAndLateFeeGreaterThan(user, 0.0) > 0)
+            throw new AuthException("有超期图书");
         //用户是否超过借书上限
         log.info("当前已借书数量：" + borrowRecordRepository.countByUserAndReturnTimeIsNull(user));
         if (borrowRecordRepository.countByUserAndReturnTimeIsNull(user) >= user.getGrade().getMaxHoldings()) {
@@ -88,10 +96,11 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         borrowRecordRepository.save(borrowRecord);
         holding.setStatus(BookStatusEnum.BORROWED);
         holdingRepository.save(holding);
+        mailService.sendBorrowSuccessMail(borrowRecord);
     }
 
     @Override
-    public Boolean returnHolding(String barcode) {
+    public Boolean returnHolding(String barcode){
         Holding holding = holdingService.getHoldingByBarcode(barcode);
         if (holding == null) {
             throw new NotFoundException("");
@@ -119,10 +128,10 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         return true;
     }
 
-    private void processHoldingOfReturn(Holding holding) {
+    private void processHoldingOfReturn(Holding holding){
         if (holding.getStatus() == BookStatusEnum.BORROWED) {
             holding.setStatus(BookStatusEnum.AVAILABLE);
-
+            holdingRepository.save(holding);
             var reservationList=reservationRepository.findByBookInfo_IsbnAndBookIsNullOrderBySubmitTime(holding.getBook().getIsbn());
             if (!reservationList.isEmpty()){
                 var reservation = reservationList.get(0);
@@ -131,16 +140,17 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
                 reservation.setStatus(ReserveStatusEnum.RESERVED);
                 reservation.setLastDate(new java.sql.Date((long) (reservation.getUser().getGrade().getMaxReserveTime())
                         * 24 * 3600 * 1000 + new Date().getTime()));
+                holdingRepository.save(holding);
                 reservationRepository.save(reservation);
-                //TODO: 被预定，发邮件/短信通知预定者
+                // 被预定，发邮件/短信通知预定者
                 String bookName = reservation.getBookInfo().getName();
                 smsService.sendReservationSuccessSms(reservation.getUser().getTel(),
                         "《" + bookName.substring(0, Math.min(bookName.length(), 10)) + "》",
                         new java.sql.Date(reservation.getSubmitTime().getTime()).toString(),
                         reservation.getUser().getGrade().getMaxReserveTime(),
                         reservation.getLastDate().toString());
+                mailService.sendReserveSuccessMail(reservation);
             }
-            holdingRepository.save(holding);
         }
     }
 
