@@ -68,5 +68,12 @@ public class UserRestController {
         return responseDto;
     }
 
-    // TODO: 用户名修改、等级设置
+    @PostMapping("/update/username/{username}")
+    public CommonResponseDto updateUsername(@PathVariable String username){
+        CommonResponseDto responseDto = new CommonResponseDto();
+        responseDto.setArgs(userService.updateUsername(username));
+        return responseDto;
+    }
+
+    // TODO: 等级设置
 }

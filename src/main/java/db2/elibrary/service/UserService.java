@@ -22,5 +22,6 @@ public interface UserService {
     Boolean UpdateCardNo(String tel,String cardNo);
     Double getBalance(String tel) throws NotFoundException;
     User getUserByCardNo(String cardNo);
+    Boolean updateUsername(String username);
 
 }

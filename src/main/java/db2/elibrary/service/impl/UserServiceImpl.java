@@ -121,4 +121,16 @@ public class UserServiceImpl implements UserService {
     public void updateUser(User user) {
         userRepository.save(user);
     }
+
+    @Override
+    public Boolean updateUsername(String username) {
+        Optional<User> userOptional = userRepository.findById(Objects.requireNonNull(UserUtil.getCurrentUserAccount()));
+        if(userOptional.isEmpty()){
+            throw new NotFoundException("");
+        }
+        User user = userOptional.get();
+        user.setUsername(username);
+        userRepository.save(user);
+        return true;
+    }
 }
