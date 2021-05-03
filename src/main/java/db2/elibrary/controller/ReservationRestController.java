@@ -16,7 +16,6 @@ public class ReservationRestController {
         this.reservationService = reservationService;
     }
 
-    // TODO: 新增预约记录
     @PostMapping("/new/{isbn}")
     public CommonResponseDto makeReservation(@PathVariable String isbn){
         CommonResponseDto responseDto = new CommonResponseDto();
@@ -24,10 +23,11 @@ public class ReservationRestController {
         return responseDto;
     }
 
-    // TODO: 取消预约记录
     @DeleteMapping("/del/{id}")
     public CommonResponseDto cancelReservation(@PathVariable Integer id){
-        return null;
+        CommonResponseDto responseDto = new CommonResponseDto();
+        responseDto.setArgs(reservationService.cancelReservation(id));
+        return responseDto;
     }
 
     // TODO: 管理员功能，获取当前所有处于RESERVED状态的在馆图书列表，需要定义一个返回类

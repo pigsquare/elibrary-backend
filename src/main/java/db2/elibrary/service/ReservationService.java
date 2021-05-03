@@ -6,4 +6,5 @@ public interface ReservationService {
     Reservation findByBookIdAndUserId(Integer bookId, String userId);
     void saveReservation(Reservation reservation);
     String makeReservation(String isbn);
+    Boolean cancelReservation(Integer id);
 }

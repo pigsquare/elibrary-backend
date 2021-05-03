@@ -40,7 +40,6 @@ public class HoldingRestController {
         return holdingService.getHoldingsByIsbn(isbn);
     }
 
-    // TODO: update book status
     @PostMapping("/update")
     public CommonResponseDto updateHolding(@RequestBody @Valid HoldingUpdateRequestDto requestDto){
         CommonResponseDto responseDto = new CommonResponseDto();

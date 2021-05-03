@@ -87,7 +87,7 @@ public class ReservationServiceImpl implements ReservationService {
         res = "预约成功，等待图书归还！";
 
         List<Holding> holdingList = holdingRepository.findByBookAndStatus(book, BookStatusEnum.AVAILABLE);
-        if(!holdingList.isEmpty()){
+        if (!holdingList.isEmpty()) {
             Holding holding = holdingList.get(0);
             holding.setStatus(BookStatusEnum.RESERVED);
             reservation.setBook(holding);
@@ -99,5 +99,21 @@ public class ReservationServiceImpl implements ReservationService {
         reservationRepository.save(reservation);
 
         return res;
+    }
+
+    @Override
+    public Boolean cancelReservation(Integer id) {
+        Optional<Reservation> optionalReservation = reservationRepository.findById(id);
+        if(optionalReservation.isEmpty()){
+            throw new NotFoundException("预定记录不存在");
+        }
+        Reservation reservation = optionalReservation.get();
+        if(!reservation.getUser().getId().equals(UserUtil.getCurrentUserAccount())){
+            throw new AuthException("用户不合法");
+        }
+        reservation.setComplete(true);
+        reservation.setStatus(ReserveStatusEnum.CANCELLED);
+        reservationRepository.save(reservation);
+        return true;
     }
 }
