@@ -6,7 +6,9 @@ import db2.elibrary.entity.enums.ReserveStatusEnum;
 import db2.elibrary.exception.AuthException;
 import db2.elibrary.exception.NotFoundException;
 import db2.elibrary.repository.*;
+import db2.elibrary.service.MailService;
 import db2.elibrary.service.ReservationService;
+import db2.elibrary.service.SmsService;
 import db2.elibrary.util.UserUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +27,18 @@ public class ReservationServiceImpl implements ReservationService {
     private final BookRepository bookRepository;
     private final BorrowRecordRepository borrowRecordRepository;
     private final HoldingRepository holdingRepository;
+    private final MailService mailService;
+    private final SmsService smsService;
 
     @Autowired
-    public ReservationServiceImpl(ReservationRepository reservationRepository, UserRepository userRepository, BookRepository bookRepository, BorrowRecordRepository borrowRecordRepository, HoldingRepository holdingRepository) {
+    public ReservationServiceImpl(ReservationRepository reservationRepository, UserRepository userRepository, BookRepository bookRepository, BorrowRecordRepository borrowRecordRepository, HoldingRepository holdingRepository, MailService mailService, SmsService smsService) {
         this.reservationRepository = reservationRepository;
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
         this.borrowRecordRepository = borrowRecordRepository;
         this.holdingRepository = holdingRepository;
+        this.mailService = mailService;
+        this.smsService = smsService;
     }
 
     @Override
@@ -85,18 +91,29 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setBookInfo(book);
         reservation.setUser(user);
         res = "预约成功，等待图书归还！";
-
+        reservationRepository.save(reservation);
         List<Holding> holdingList = holdingRepository.findByBookAndStatus(book, BookStatusEnum.AVAILABLE);
         if (!holdingList.isEmpty()) {
             Holding holding = holdingList.get(0);
             holding.setStatus(BookStatusEnum.RESERVED);
             reservation.setBook(holding);
+            reservation.setStatus(ReserveStatusEnum.RESERVED);
             reservation.setLastDate(new java.sql.Date((long) (user.getGrade().getMaxReserveTime()) * 24 * 3600 * 1000
                     + new Date().getTime()));
             holdingRepository.save(holding);
+            reservationRepository.save(reservation);
+            // 被预定，发邮件/短信通知预定者
+            mailService.sendReserveSuccessMail(reservation);
+
+            String bookName = reservation.getBookInfo().getName();
+            smsService.sendReservationSuccessSms(reservation.getUser().getTel(),
+                    "《" + bookName.substring(0, Math.min(bookName.length(), 10)) + "》",
+                    new java.sql.Date(reservation.getSubmitTime().getTime()).toString(),
+                    reservation.getUser().getGrade().getMaxReserveTime(),
+                    reservation.getLastDate().toString());
             res = "预约成功，已成功锁定图书！";
         }
-        reservationRepository.save(reservation);
+
 
         return res;
     }
