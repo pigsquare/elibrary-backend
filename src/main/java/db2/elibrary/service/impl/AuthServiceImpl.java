@@ -31,11 +31,11 @@ import java.util.Random;
 @Slf4j
 @Service
 public class AuthServiceImpl implements AuthService {
-    private UserRepository userRepository;
-    private JwtUtil jwtUtil;
-    private AuthenticationManager authenticationManager;
-    private PendingRegisterUserRepository pendingRegisterUserRepository;
-    private SmsService smsService;
+    private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
+    private final AuthenticationManager authenticationManager;
+    private final PendingRegisterUserRepository pendingRegisterUserRepository;
+    private final SmsService smsService;
 
     private AuthTokenResponseDto generateTokenResponse(User user){
         String jwtToken = jwtUtil.generateToken(user);
