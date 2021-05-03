@@ -4,10 +4,13 @@ import db2.elibrary.dto.auth.AddUserTestDto;
 import db2.elibrary.dto.auth.AuthTokenRequestDto;
 import db2.elibrary.dto.auth.AuthTokenResponseDto;
 import db2.elibrary.dto.auth.ValidateByTelRequestDto;
+import db2.elibrary.entity.Grade;
 import db2.elibrary.entity.PendingRegisterUser;
 import db2.elibrary.entity.User;
 import db2.elibrary.entity.enums.RoleEnum;
 import db2.elibrary.exception.AuthException;
+import db2.elibrary.exception.NotFoundException;
+import db2.elibrary.repository.GradeRepository;
 import db2.elibrary.repository.PendingRegisterUserRepository;
 import db2.elibrary.repository.UserRepository;
 import db2.elibrary.service.AuthService;
@@ -26,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Optional;
 import java.util.Random;
 
 @Slf4j
@@ -35,6 +39,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final PendingRegisterUserRepository pendingRegisterUserRepository;
+    private final GradeRepository gradeRepository;
     private final SmsService smsService;
 
     private AuthTokenResponseDto generateTokenResponse(User user){
@@ -50,11 +55,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Autowired
-    public AuthServiceImpl(UserRepository userRepository, JwtUtil jwtUtil, AuthenticationManager authenticationManager, PendingRegisterUserRepository pendingRegisterUserRepository, SmsService smsService) {
+    public AuthServiceImpl(UserRepository userRepository, JwtUtil jwtUtil, AuthenticationManager authenticationManager, PendingRegisterUserRepository pendingRegisterUserRepository, GradeRepository gradeRepository, SmsService smsService) {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
         this.authenticationManager = authenticationManager;
         this.pendingRegisterUserRepository = pendingRegisterUserRepository;
+        this.gradeRepository = gradeRepository;
         this.smsService = smsService;
     }
 
@@ -131,7 +137,12 @@ public class AuthServiceImpl implements AuthService {
                 newUser.setUsername(username);
                 newUser.setName("用户" + username);
                 newUser.setUnencodedPassword(password);
-                // TODO: 设置等级1
+                // 设置等级1
+                Optional<Grade> gradeOptional = gradeRepository.findById(1);
+                if(gradeOptional.isEmpty()){
+                    throw new NotFoundException("未定义该等级");
+                }
+                newUser.setGrade(gradeOptional.get());
                 userRepository.save(newUser);
                 pendingRegisterUserRepository.delete(pendingRegisterUser.get());
                 return true;
