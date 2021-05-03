@@ -1,14 +1,11 @@
 package db2.elibrary.service.impl;
 
-import db2.elibrary.entity.Book;
-import db2.elibrary.entity.Reservation;
-import db2.elibrary.entity.User;
+import db2.elibrary.entity.*;
+import db2.elibrary.entity.enums.BookStatusEnum;
 import db2.elibrary.entity.enums.ReserveStatusEnum;
 import db2.elibrary.exception.AuthException;
 import db2.elibrary.exception.NotFoundException;
-import db2.elibrary.repository.BookRepository;
-import db2.elibrary.repository.ReservationRepository;
-import db2.elibrary.repository.UserRepository;
+import db2.elibrary.repository.*;
 import db2.elibrary.service.ReservationService;
 import db2.elibrary.util.UserUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,12 +23,16 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
+    private final BorrowRecordRepository borrowRecordRepository;
+    private final HoldingRepository holdingRepository;
 
     @Autowired
-    public ReservationServiceImpl(ReservationRepository reservationRepository, UserRepository userRepository, BookRepository bookRepository) {
+    public ReservationServiceImpl(ReservationRepository reservationRepository, UserRepository userRepository, BookRepository bookRepository, BorrowRecordRepository borrowRecordRepository, HoldingRepository holdingRepository) {
         this.reservationRepository = reservationRepository;
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
+        this.borrowRecordRepository = borrowRecordRepository;
+        this.holdingRepository = holdingRepository;
     }
 
     @Override
@@ -54,17 +56,26 @@ public class ReservationServiceImpl implements ReservationService {
         if (userId == null) {
             throw new AuthException("");
         }
-        // TODO: 1.用户是否合法；2.判断用户已经借出的书目+未完成预约的总数是否大于user.grade.max_holdings; 3.书是否存在； 4.读者是否有其他的正在借而且超期的图书
+        //用户是否存在
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isEmpty()) {
             throw new NotFoundException("用户不存在");
         }
         User user = optionalUser.get();
-        // 这是未完成预约数量
+        //判断用户已经借出的书目+未完成预约的总数是否大于user.grade.max_holdings
+        Integer borrowNum = borrowRecordRepository.countBorrowRecordsByUserAndReturnTimeIsNull(user);
         Integer reservationNum = reservationRepository.findByUserIdAndCompleteIsFalseOrderBySubmitTimeDesc(userId).size();
+        if (borrowNum + reservationNum > user.getGrade().getMaxHoldings()) {
+            throw new AuthException("超过最大借书和预约数量");
+        }
+        // 书是否存在
         Optional<Book> optionalBook = bookRepository.findById(isbn);
         if (optionalBook.isEmpty()) {
             throw new NotFoundException("图书不存在");
+        }
+        //读者是否有其他的正在借而且超期的图书
+        if (borrowRecordRepository.countByUserAndReturnTimeIsNullAndLateFeeGreaterThan(user, 0.0) > 0) {
+            throw new AuthException("有其他的正在借而且超期的图书");
         }
         Book book = optionalBook.get();
         Reservation reservation = new Reservation();
@@ -73,11 +84,20 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setStatus(ReserveStatusEnum.WAITING);
         reservation.setBookInfo(book);
         reservation.setUser(user);
-        reservationRepository.save(reservation);
         res = "预约成功，等待图书归还！";
 
-        // TODO: 检查当前在馆图书是否存在预约图书
-        // res = "预约成功，已成功锁定图书！";
+        List<Holding> holdingList = holdingRepository.findByBookAndStatus(book, BookStatusEnum.AVAILABLE);
+        if(!holdingList.isEmpty()){
+            Holding holding = holdingList.get(0);
+            holding.setStatus(BookStatusEnum.RESERVED);
+            reservation.setBook(holding);
+            reservation.setLastDate(new java.sql.Date((long) (user.getGrade().getMaxReserveTime()) * 24 * 3600 * 1000
+                    + new Date().getTime()));
+            holdingRepository.save(holding);
+            res = "预约成功，已成功锁定图书！";
+        }
+        reservationRepository.save(reservation);
+
         return res;
     }
 }
