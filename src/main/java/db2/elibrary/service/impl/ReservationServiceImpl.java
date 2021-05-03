@@ -130,6 +130,11 @@ public class ReservationServiceImpl implements ReservationService {
         }
         reservation.setComplete(true);
         reservation.setStatus(ReserveStatusEnum.CANCELLED);
+        if(reservation.getBook()!=null){
+            Holding holding = reservation.getBook();
+            holding.setStatus(BookStatusEnum.AVAILABLE);
+            holdingRepository.save(holding);
+        }
         reservationRepository.save(reservation);
         return true;
     }

@@ -35,6 +35,7 @@ public class ReservationRestController {
         return responseDto;
     }
 
+    // TODO: 返回详细信息，包括用户、图书、条码
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     @GetMapping("/library/reserved")
     public List<HoldingInfoResponseDto> getReservedBookInLibrary(){
