@@ -1,10 +1,15 @@
 package db2.elibrary.controller;
 
 import db2.elibrary.dto.CommonResponseDto;
+import db2.elibrary.dto.holding.HoldingInfoResponseDto;
+import db2.elibrary.entity.Holding;
 import db2.elibrary.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/reservation")
@@ -30,11 +35,15 @@ public class ReservationRestController {
         return responseDto;
     }
 
-    // TODO: 管理员功能，获取当前所有处于RESERVED状态的在馆图书列表，需要定义一个返回类
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     @GetMapping("/library/reserved")
-    public CommonResponseDto getReservedBookInLibrary(){
-        return null;
+    public List<HoldingInfoResponseDto> getReservedBookInLibrary(){
+        List<HoldingInfoResponseDto> holdingInfoResponseDtoList = new ArrayList<>();
+        List<Holding> holdingList = reservationService.getReservedBookInLibrary();
+        for(Holding holding:holdingList){
+            holdingInfoResponseDtoList.add(new HoldingInfoResponseDto(holding));
+        }
+        return holdingInfoResponseDtoList;
     }
 
 }

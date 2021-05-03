@@ -116,4 +116,9 @@ public class ReservationServiceImpl implements ReservationService {
         reservationRepository.save(reservation);
         return true;
     }
+
+    @Override
+    public List<Holding> getReservedBookInLibrary() {
+        return holdingRepository.findByStatus(BookStatusEnum.RESERVED);
+    }
 }

@@ -12,4 +12,5 @@ public interface HoldingRepository extends JpaRepository<Holding, Integer> {
     Optional<Holding> findByBarcode(String barcode);
     List<Holding> findByBook(Book book);
     List<Holding> findByBookAndStatus(Book book, BookStatusEnum bookStatusEnum);
+    List<Holding> findByStatus(BookStatusEnum bookStatusEnum);
 }
