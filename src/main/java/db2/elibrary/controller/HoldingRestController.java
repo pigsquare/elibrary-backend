@@ -44,7 +44,7 @@ public class HoldingRestController {
     @PostMapping("/update")
     public CommonResponseDto updateHolding(@RequestBody @Valid HoldingUpdateRequestDto requestDto){
         CommonResponseDto responseDto = new CommonResponseDto();
-        responseDto.setArgs(null);
+        responseDto.setArgs(holdingService.updateHolding(requestDto.getBarcode(),requestDto.getStatus()));
         return responseDto;
     }
 }
