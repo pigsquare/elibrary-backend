@@ -15,16 +15,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/borrow")
+@RequestMapping("/borrow-records")
 public class BorrowRestController {
     private final BorrowRecordService borrowRecordService;
 
     @Autowired
     public BorrowRestController(BorrowRecordService borrowRecordService){ this.borrowRecordService = borrowRecordService; }
 
-
+    // 添加借书记录
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
-    @PostMapping("/borrow")
+    @PostMapping("/")
     public CommonResponseDto borrowBook(@RequestBody @Valid BorrowBookRequestDto requestDto){
         CommonResponseDto commonResponseDto = new CommonResponseDto();
         if(borrowRecordService.borrowHolding(requestDto.getCardNo(),requestDto.getBarcode())){
@@ -34,9 +34,9 @@ public class BorrowRestController {
         }
         return commonResponseDto;
     }
-
+    // 还书
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
-    @PostMapping("/return/{barcode}")
+    @PatchMapping("/holdings/{barcode}/return")
     public CommonResponseDto returnBook(@PathVariable String barcode){
         CommonResponseDto commonResponseDto = new CommonResponseDto();
         if(borrowRecordService.returnHolding(barcode)){
@@ -46,8 +46,8 @@ public class BorrowRestController {
         }
         return commonResponseDto;
     }
-
-    @PostMapping("/renew/{recordId}")
+    // 续借
+    @PatchMapping("/{recordId}/renew")
     public CommonResponseDto renewBook(@PathVariable Integer recordId){
         CommonResponseDto commonResponseDto = new CommonResponseDto();
         if(borrowRecordService.renewHolding(recordId)){
@@ -58,7 +58,8 @@ public class BorrowRestController {
         return commonResponseDto;
     }
 
-    @GetMapping("/list")
+    // 获取所有借书记录
+    @GetMapping("/")
     public List<BorrowRecordResponseDto> getList(){
         List<BorrowRecordResponseDto> borrowRecordResponseDtoList = new ArrayList<>();
         List<BorrowRecord> borrowRecordList = borrowRecordService.getList();
@@ -67,8 +68,8 @@ public class BorrowRestController {
         }
         return borrowRecordResponseDtoList;
     }
-
-    @GetMapping("/list/borrowing")
+    // 获取借出未还状态的借书记录
+    @GetMapping("/borrowings")
     public List<BorrowRecordResponseDto> getBorrowingList(){
         List<BorrowRecordResponseDto> borrowRecordResponseDtoList = new ArrayList<>();
         List<BorrowRecord> borrowRecordList = borrowRecordService.getBorrowingList();
@@ -80,7 +81,7 @@ public class BorrowRestController {
 
     // 根据读者卡号获取当前正在借阅图书
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
-    @GetMapping("/list/{card}")
+    @GetMapping("/users/{card}")
     public List<BorrowRecordResponseDto> getBorrowingListByCard(@PathVariable String card){
         List<BorrowRecordResponseDto> borrowRecordResponseDtoList = new ArrayList<>();
         List<BorrowRecord> borrowRecords = borrowRecordService.getBorrowingListByCardNo(card);
@@ -90,9 +91,9 @@ public class BorrowRestController {
         return borrowRecordResponseDtoList;
     }
 
-    // 假期续借
-    //@PreAuthorize("hasAnyRole('STAFF','ADMIN')")
-    @PostMapping("/vacation")
+    // 假期延长还书日期
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
+    @PatchMapping("/borrowings")
     public CommonResponseDto delayLastReturnDateForVacation(@RequestBody @Valid VacationRequestDto requestDto){
         CommonResponseDto responseDto = new CommonResponseDto();
         responseDto.setArgs(borrowRecordService.delayLastReturnDateForVacation(requestDto.getStartTime(),requestDto.getEndTime()));

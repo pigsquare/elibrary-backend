@@ -12,7 +12,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/book")
+@RequestMapping("/books")
 public class BookRestController {
     private BookService bookService;
 
@@ -21,25 +21,26 @@ public class BookRestController {
         this.bookService = bookService;
     }
 
-    @GetMapping("/all")
+    // 获取全部图书的列表
+    @GetMapping("/")
     public List<BookInfoResponseDto> getAllBooks(){
         return bookService.getBooks();
     }
-
+    // 添加图书
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
-    @PostMapping("/add")
+    @PostMapping("/")
     public Book addBook(@RequestBody @Valid UpdateBookRequestDto requestDto){
         return bookService.addBook(requestDto);
     }
-
+    // 修改图书信息
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
-    @PostMapping("/update")
-    public Book updateBook(@RequestBody @Valid UpdateBookRequestDto requestDto){
+    @PutMapping("/{isbn}")
+    public Book updateBook(@PathVariable String isbn, @RequestBody @Valid UpdateBookRequestDto requestDto){
         return bookService.updateBook(requestDto);
     }
-
+    // 删除图书
     @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
-    @DeleteMapping("/del/{isbn}")
+    @DeleteMapping("/{isbn}")
     public Boolean delBook(@PathVariable String isbn){
         return bookService.delBook(isbn);
     }

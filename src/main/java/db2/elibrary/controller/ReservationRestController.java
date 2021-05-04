@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/reservation")
+@RequestMapping("/reservations")
 public class ReservationRestController {
     private final ReservationService reservationService;
 
@@ -20,15 +20,15 @@ public class ReservationRestController {
     public ReservationRestController(ReservationService reservationService) {
         this.reservationService = reservationService;
     }
-
-    @PostMapping("/new/{isbn}")
+    // 增加订阅记录
+    @PostMapping("/books/{isbn}")
     public CommonResponseDto makeReservation(@PathVariable String isbn){
         CommonResponseDto responseDto = new CommonResponseDto();
         responseDto.setMessage(reservationService.makeReservation(isbn));
         return responseDto;
     }
-
-    @DeleteMapping("/del/{id}")
+    // 删除订阅记录
+    @DeleteMapping("/{id}")
     public CommonResponseDto cancelReservation(@PathVariable Integer id){
         CommonResponseDto responseDto = new CommonResponseDto();
         responseDto.setArgs(reservationService.cancelReservation(id));
@@ -37,7 +37,7 @@ public class ReservationRestController {
 
     // TODO: 返回详细信息，包括用户、图书、条码
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
-    @GetMapping("/library/reserved")
+    @GetMapping("/reserved-holdings")
     public List<HoldingInfoResponseDto> getReservedBookInLibrary(){
         List<HoldingInfoResponseDto> holdingInfoResponseDtoList = new ArrayList<>();
         List<Holding> holdingList = reservationService.getReservedBookInLibrary();

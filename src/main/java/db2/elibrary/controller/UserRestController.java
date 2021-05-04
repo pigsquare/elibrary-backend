@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserRestController {
     private UserService userService;
 
@@ -22,13 +22,13 @@ public class UserRestController {
     public UserRestController(UserService userService) {
         this.userService = userService;
     }
-
-    @GetMapping("/all")
+    // 获取所有用户列表
+    @GetMapping("/")
     public List<User> findAll() {
         return userService.getAll();
     }
-
-    @PostMapping("/password/change")
+    // 修改当前用户密码
+    @PutMapping("/current-user/password")
     public CommonResponseDto changePassword(@Valid @RequestBody ChangePasswordRequestDto requestDto) {
         CommonResponseDto responseDto = new CommonResponseDto();
         if (userService.changePassword(requestDto.getOldPassword(), requestDto.getNewPassword())) {
@@ -38,8 +38,8 @@ public class UserRestController {
         }
         return responseDto;
     }
-
-    @PostMapping("/card")
+    // 办理借书卡
+    @PostMapping("/current-user/card")
     public CommonResponseDto libraryCardProcess(@RequestBody @Valid LibraryCardRequestDto requestDto) {
         CommonResponseDto responseDto = new CommonResponseDto();
         if (userService.UpdateCardNo("+86" + requestDto.getTel(), requestDto.getCardNo())) {
@@ -49,15 +49,15 @@ public class UserRestController {
         }
         return responseDto;
     }
-
-    @GetMapping("/profile")
+    // 获取当前用户信息
+    @GetMapping("/current-user")
     public UserProfileResponseDto getProfile() {
         User user = userService.getProfile();
         return new UserProfileResponseDto(user);
     }
 
     // 生成并发送验证邮件
-    @PostMapping("/update/mail")
+    @PostMapping("/validation")
     public CommonResponseDto submitEmail(@RequestBody MailAddRequestDto requestDto) throws IOException, TemplateException {
         CommonResponseDto responseDto = new CommonResponseDto();
         if (userService.sendMailVerify(requestDto.getEmail())) {
@@ -65,16 +65,16 @@ public class UserRestController {
         }
         return responseDto;
     }
-
-    @PostMapping("/update/username/{username}")
+    // 更新用户名
+    @PatchMapping("/username/{username}")
     public CommonResponseDto updateUsername(@PathVariable String username) {
         CommonResponseDto responseDto = new CommonResponseDto();
         responseDto.setArgs(userService.updateUsername(username));
         return responseDto;
     }
-
+    // 更新用户等级
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
-    @PostMapping("/update/grade")
+    @PatchMapping("/grade")
     public CommonResponseDto updateGrade(@RequestBody UserGradeUpdateRequestDto requestDto) {
         CommonResponseDto responseDto = new CommonResponseDto();
         responseDto.setArgs(userService.updateGrade(requestDto.getUserId(),requestDto.getGradeId()));
