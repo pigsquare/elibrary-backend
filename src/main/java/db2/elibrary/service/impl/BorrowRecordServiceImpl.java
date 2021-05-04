@@ -197,4 +197,10 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         User user = userService.getUserByCardNo(cardNo);
         return borrowRecordRepository.findByUser_IdAndReturnTimeIsNullOrderByBorrowTimeDesc(user.getId());
     }
+
+    @Override
+    public Boolean delayLastReturnDateForVacation(Date startTime, Date endTime) {
+        // Todo: mapper
+        return true;
+    }
 }

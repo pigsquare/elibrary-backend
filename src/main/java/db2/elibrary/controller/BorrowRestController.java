@@ -3,6 +3,7 @@ package db2.elibrary.controller;
 import db2.elibrary.dto.CommonResponseDto;
 import db2.elibrary.dto.borrow.BorrowBookRequestDto;
 import db2.elibrary.dto.borrow.BorrowRecordResponseDto;
+import db2.elibrary.dto.borrow.VacationRequestDto;
 import db2.elibrary.entity.BorrowRecord;
 import db2.elibrary.service.BorrowRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,5 +88,14 @@ public class BorrowRestController {
             borrowRecordResponseDtoList.add(new BorrowRecordResponseDto(borrowRecord));
         }
         return borrowRecordResponseDtoList;
+    }
+
+    // 假期续借
+    //@PreAuthorize("hasAnyRole('STAFF','ADMIN')")
+    @PostMapping("/vacation")
+    public CommonResponseDto delayLastReturnDateForVacation(@RequestBody @Valid VacationRequestDto requestDto){
+        CommonResponseDto responseDto = new CommonResponseDto();
+        responseDto.setArgs(borrowRecordService.delayLastReturnDateForVacation(requestDto.getStartTime(),requestDto.getEndTime()));
+        return responseDto;
     }
 }
