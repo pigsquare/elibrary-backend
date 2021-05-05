@@ -21,8 +21,8 @@ public class HoldingRestController {
         this.holdingService = holdingService;
     }
 
-    // 获取全部藏书信息
-    @GetMapping("/{isbn}")
+    // 获取该isbn图书的条形码号
+    @GetMapping("/barcode/{isbn}")
     public CommonResponseDto getBarcodeByIsbn(@PathVariable String isbn){
         CommonResponseDto responseDto = new CommonResponseDto();
         responseDto.setMessage(holdingService.getBarcode(isbn));
