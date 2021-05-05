@@ -8,6 +8,7 @@ import db2.elibrary.entity.enums.BookStatusEnum;
 import db2.elibrary.entity.enums.ReserveStatusEnum;
 import db2.elibrary.exception.AuthException;
 import db2.elibrary.exception.NotFoundException;
+import db2.elibrary.mapper.BorrowRecordMapper;
 import db2.elibrary.repository.AdminRepository;
 import db2.elibrary.repository.BorrowRecordRepository;
 import db2.elibrary.repository.HoldingRepository;
@@ -35,9 +36,10 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
     private final ReservationRepository reservationRepository;
     private final SmsService smsService;
     private final MailService mailService;
+    private final BorrowRecordMapper borrowRecordMapper;
 
     @Autowired
-    public BorrowRecordServiceImpl(BorrowRecordRepository borrowRecordRepository, HoldingService holdingService, ReservationService reservationService, UserService userService, AdminRepository adminRepository, HoldingRepository holdingRepository, ReservationRepository reservationRepository, SmsService smsService, MailService mailService) {
+    public BorrowRecordServiceImpl(BorrowRecordRepository borrowRecordRepository, HoldingService holdingService, ReservationService reservationService, UserService userService, AdminRepository adminRepository, HoldingRepository holdingRepository, ReservationRepository reservationRepository, SmsService smsService, MailService mailService, BorrowRecordMapper borrowRecordMapper) {
         this.borrowRecordRepository = borrowRecordRepository;
         this.holdingService = holdingService;
         this.reservationService = reservationService;
@@ -47,6 +49,7 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         this.reservationRepository = reservationRepository;
         this.smsService = smsService;
         this.mailService = mailService;
+        this.borrowRecordMapper = borrowRecordMapper;
     }
 
     @Override
@@ -199,8 +202,8 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
     }
 
     @Override
-    public Boolean delayLastReturnDateForVacation(Date startTime, Date endTime) {
-        // Todo: mapper
-        return true;
+    public Integer delayLastReturnDateForVacation(Date startTime, Date endTime) {
+        return borrowRecordMapper.vocationRenewal(new java.sql.Date(startTime.getTime() - 3*24*3600*1000),
+                new java.sql.Date(endTime.getTime() + 3*24*3600*1000));
     }
 }

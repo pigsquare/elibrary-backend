@@ -21,5 +21,5 @@ public interface BorrowRecordService {
     //根据卡号获取当前用户借书未还列表
     List<BorrowRecord> getBorrowingListByCardNo(String cardNo);
     //根据假期起止日期延长还书时间
-    Boolean delayLastReturnDateForVacation(Date startTime, Date endTime);
+    Integer delayLastReturnDateForVacation(Date startTime, Date endTime);
 }
