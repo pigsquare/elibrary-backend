@@ -1,9 +1,9 @@
 package db2.elibrary.service.impl;
 
-import db2.elibrary.dto.BookInfoResponseDto;
-import db2.elibrary.dto.BookSearchRequestDto;
-import db2.elibrary.dto.IsbnInfoResponseDto;
-import db2.elibrary.dto.UpdateBookRequestDto;
+import db2.elibrary.dto.book.BookInfoResponseDto;
+import db2.elibrary.dto.book.BookSearchRequestDto;
+import db2.elibrary.dto.book.IsbnInfoResponseDto;
+import db2.elibrary.dto.book.UpdateBookRequestDto;
 import db2.elibrary.entity.Admin;
 import db2.elibrary.entity.Book;
 import db2.elibrary.exception.AuthException;

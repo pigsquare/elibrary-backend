@@ -1,6 +1,10 @@
 package db2.elibrary.controller;
 
 import db2.elibrary.dto.*;
+import db2.elibrary.dto.auth.AuthTokenRequestDto;
+import db2.elibrary.dto.auth.AuthTokenResponseDto;
+import db2.elibrary.dto.auth.RegisterByTelDto;
+import db2.elibrary.dto.auth.ValidateByTelRequestDto;
 import db2.elibrary.exception.AuthException;
 import db2.elibrary.service.AuthService;
 import lombok.extern.slf4j.Slf4j;

@@ -4,7 +4,7 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import db2.elibrary.dto.IsbnInfoResponseDto;
+import db2.elibrary.dto.book.IsbnInfoResponseDto;
 import db2.elibrary.repository.BookRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.htmlcleaner.HtmlCleaner;

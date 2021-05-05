@@ -1,4 +1,4 @@
-package db2.elibrary.dto;
+package db2.elibrary.dto.auth;
 
 import lombok.Data;
 

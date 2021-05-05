@@ -1,7 +1,9 @@
 package db2.elibrary.service.impl;
 
+import db2.elibrary.entity.Grade;
 import db2.elibrary.entity.User;
 import db2.elibrary.exception.NotFoundException;
+import db2.elibrary.repository.GradeRepository;
 import db2.elibrary.repository.UserRepository;
 import db2.elibrary.service.MailService;
 import db2.elibrary.service.UserService;
@@ -21,19 +23,21 @@ import java.util.*;
 
 @Service("user_service")
 public class UserServiceImpl implements UserService {
-    private UserRepository userRepository;
-    private MailService mailService;
-    private JwtUtil jwtUtil;
-    private FreeMarkerConfigurer freeMarkerConfigurer;
-    private JavaMailSender mailSender;
+    private final UserRepository userRepository;
+    private final MailService mailService;
+    private final JwtUtil jwtUtil;
+    private final FreeMarkerConfigurer freeMarkerConfigurer;
+    private final JavaMailSender mailSender;
+    private final GradeRepository gradeRepository;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, MailService mailService, JwtUtil jwtUtil, FreeMarkerConfigurer freeMarkerConfigurer, JavaMailSender mailSender) {
+    public UserServiceImpl(UserRepository userRepository, MailService mailService, JwtUtil jwtUtil, FreeMarkerConfigurer freeMarkerConfigurer, JavaMailSender mailSender, GradeRepository gradeRepository) {
         this.userRepository = userRepository;
         this.mailService = mailService;
         this.jwtUtil = jwtUtil;
         this.freeMarkerConfigurer = freeMarkerConfigurer;
         this.mailSender = mailSender;
+        this.gradeRepository = gradeRepository;
     }
 
     @Override
@@ -120,5 +124,34 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUser(User user) {
         userRepository.save(user);
+    }
+
+    @Override
+    public Boolean updateUsername(String username) {
+        Optional<User> userOptional = userRepository.findById(Objects.requireNonNull(UserUtil.getCurrentUserAccount()));
+        if(userOptional.isEmpty()){
+            throw new NotFoundException("");
+        }
+        User user = userOptional.get();
+        user.setUsername(username);
+        userRepository.save(user);
+        return true;
+    }
+
+    @Override
+    public Boolean updateGrade(String userId, Integer gradeId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if(userOptional.isEmpty()){
+            throw new NotFoundException("");
+        }
+        User user = userOptional.get();
+        Optional<Grade> gradeOptional = gradeRepository.findById(gradeId);
+        if(gradeOptional.isEmpty()){
+            throw new NotFoundException("");
+        }
+        Grade grade = gradeOptional.get();
+        user.setGrade(grade);
+        userRepository.save(user);
+        return true;
     }
 }

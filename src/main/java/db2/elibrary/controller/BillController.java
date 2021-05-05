@@ -1,9 +1,8 @@
 package db2.elibrary.controller;
 
 import db2.elibrary.dto.CommonResponseDto;
-import db2.elibrary.dto.PayRequestDto;
+import db2.elibrary.dto.pay.PayRequestDto;
 import db2.elibrary.service.UserService;
-import db2.elibrary.service.impl.UserServiceImpl;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;

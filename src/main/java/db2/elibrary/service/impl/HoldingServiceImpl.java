@@ -1,7 +1,7 @@
 package db2.elibrary.service.impl;
 
-import db2.elibrary.dto.HoldingAddRequestDto;
-import db2.elibrary.dto.HoldingInfoResponseDto;
+import db2.elibrary.dto.holding.HoldingAddRequestDto;
+import db2.elibrary.dto.holding.HoldingInfoResponseDto;
 import db2.elibrary.entity.Admin;
 import db2.elibrary.entity.Holding;
 import db2.elibrary.entity.enums.BookStatusEnum;
@@ -11,8 +11,6 @@ import db2.elibrary.repository.AdminRepository;
 import db2.elibrary.repository.BookRepository;
 import db2.elibrary.repository.HoldingRepository;
 import db2.elibrary.service.HoldingService;
-import db2.elibrary.service.ReservationService;
-import db2.elibrary.service.UserService;
 import db2.elibrary.util.UserUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +23,12 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class HoldingServiceImpl implements HoldingService {
-    private BookRepository bookRepository;
-    private AdminRepository adminRepository;
-    private HoldingRepository holdingRepository;
+    private final BookRepository bookRepository;
+    private final AdminRepository adminRepository;
+    private final HoldingRepository holdingRepository;
 
     @Autowired
-    public HoldingServiceImpl(BookRepository bookRepository, AdminRepository adminRepository, HoldingRepository holdingRepository, UserService userService, ReservationService reservationService) {
+    public HoldingServiceImpl(BookRepository bookRepository, AdminRepository adminRepository, HoldingRepository holdingRepository) {
         this.bookRepository = bookRepository;
         this.adminRepository = adminRepository;
         this.holdingRepository = holdingRepository;
@@ -90,5 +88,17 @@ public class HoldingServiceImpl implements HoldingService {
             throw new NotFoundException("");
         }
         return optionalHolding.get();
+    }
+
+    @Override
+    public Boolean updateHolding(String barcode, String status) {
+        Optional<Holding> holdingOptional = holdingRepository.findByBarcode(barcode);
+        if(holdingOptional.isEmpty()){
+            throw new NotFoundException("该藏书号不存在");
+        }
+        Holding holding = holdingOptional.get();
+        holding.setStatus(BookStatusEnum.valueOf(status));
+        holdingRepository.save(holding);
+        return true;
     }
 }

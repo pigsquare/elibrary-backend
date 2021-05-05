@@ -1,9 +1,9 @@
 package db2.elibrary.controller;
 
-import db2.elibrary.dto.BookInfoResponseDto;
-import db2.elibrary.dto.BookSearchRequestDto;
-import db2.elibrary.dto.HoldingInfoResponseDto;
-import db2.elibrary.dto.IsbnInfoResponseDto;
+import db2.elibrary.dto.book.BookInfoResponseDto;
+import db2.elibrary.dto.book.BookSearchRequestDto;
+import db2.elibrary.dto.holding.HoldingInfoResponseDto;
+import db2.elibrary.dto.book.IsbnInfoResponseDto;
 import db2.elibrary.service.BookService;
 import db2.elibrary.service.HoldingService;
 import db2.elibrary.util.crawler.HttpUtilDownPage;
@@ -27,25 +27,24 @@ public class PublicSearchController {
         this.bookService = bookService;
         this.holdingService = holdingService;
     }
-
-    @RequestMapping("/book/info/crawler/{isbn}")
+    // 获取爬虫爬取的指定图书的信息
+    @RequestMapping("/crawler/books/{isbn}")
     public IsbnInfoResponseDto getBookInfoByCrawler(@PathVariable String isbn) throws XPatherException {
         return httpUtilDownPage.parseBookInfo(isbn);
     }
-
-    @RequestMapping("/book/info/{isbn}")
+    // 获取数据库保存的指定图书的信息
+    @RequestMapping("/books/{isbn}")
     public IsbnInfoResponseDto getBookInfo(@PathVariable String isbn){
         return bookService.getBook(isbn);
     }
-
-    @RequestMapping("/book/list")
+    // 获取满足搜索条件的图书列表
+    @RequestMapping("/books")
     public List<BookInfoResponseDto> searchBook(@RequestBody @Valid BookSearchRequestDto searchRequestDto){
         return bookService.searchBooks(searchRequestDto);
     }
-
-    @GetMapping("/holding/info/{isbn}")
+    // 获取指定图书对应的藏书列表
+    @GetMapping("/books/{isbn}/holdings")
     public List<HoldingInfoResponseDto> getInfoByIsbn(@PathVariable String isbn){
         return holdingService.getHoldingsByIsbn(isbn);
     }
-
 }

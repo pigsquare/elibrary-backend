@@ -1,4 +1,4 @@
-package db2.elibrary.dto;
+package db2.elibrary.dto.user;
 
 import lombok.Data;
 
@@ -6,11 +6,11 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class LibraryCardRequestDto {
+public class UserGradeUpdateRequestDto {
     @NotNull
     @NotBlank
-    private String tel;
+    private String userId;
     @NotNull
     @NotBlank
-    private String cardNo;
+    private Integer gradeId;
 }
