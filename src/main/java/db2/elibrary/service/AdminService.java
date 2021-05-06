@@ -1,7 +1,6 @@
 package db2.elibrary.service;
 
 import db2.elibrary.dto.admin.AdminInfoResponseDto;
-import db2.elibrary.dto.book.BookInfoResponseDto;
 import db2.elibrary.entity.Admin;
 
 import java.util.List;
