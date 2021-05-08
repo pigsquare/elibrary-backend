@@ -23,5 +23,6 @@ public interface UserService {
     Double getBalance(String tel) throws NotFoundException;
     User getUserByCardNo(String cardNo);
     Boolean updateUsername(String username);
+    Boolean updateName(String name);
     Boolean updateGrade(String userId, Integer gradeId);
 }
