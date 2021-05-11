@@ -135,7 +135,7 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         if (holding.getStatus() == BookStatusEnum.BORROWED) {
             holding.setStatus(BookStatusEnum.AVAILABLE);
             holdingRepository.save(holding);
-            var reservationList=reservationRepository.findByBookInfo_IsbnAndBookIsNullOrderBySubmitTime(holding.getBook().getIsbn());
+            var reservationList=reservationRepository.findByBookInfo_IsbnAndBookIsNullAndCompleteIsFalseOrderBySubmitTime(holding.getBook().getIsbn());
             if (!reservationList.isEmpty()){
                 var reservation = reservationList.get(0);
                 holding.setStatus(BookStatusEnum.RESERVED);
