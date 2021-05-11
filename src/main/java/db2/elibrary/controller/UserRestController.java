@@ -49,6 +49,10 @@ public class UserRestController {
         }
         return responseDto;
     }
+
+    // 挂失借书卡
+    // @PatchMapping("/current-user/card")
+
     // 获取当前用户信息
     @GetMapping("/current-user")
     public UserProfileResponseDto getProfile() {
