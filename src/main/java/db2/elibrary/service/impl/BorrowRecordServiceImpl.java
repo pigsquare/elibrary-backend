@@ -135,25 +135,26 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         if (holding.getStatus() == BookStatusEnum.BORROWED) {
             holding.setStatus(BookStatusEnum.AVAILABLE);
             holdingRepository.save(holding);
-            var reservationList=reservationRepository.findByBookInfo_IsbnAndBookIsNullAndCompleteIsFalseOrderBySubmitTime(holding.getBook().getIsbn());
-            if (!reservationList.isEmpty()){
-                var reservation = reservationList.get(0);
-                holding.setStatus(BookStatusEnum.RESERVED);
-                reservation.setBook(holding);
-                reservation.setStatus(ReserveStatusEnum.RESERVED);
-                reservation.setLastDate(new java.sql.Date((long) (reservation.getUser().getGrade().getMaxReserveTime())
-                        * 24 * 3600 * 1000 + new Date().getTime()));
-                holdingRepository.save(holding);
-                reservationRepository.save(reservation);
-                // 被预定，发邮件/短信通知预定者
-                String bookName = reservation.getBookInfo().getName();
-                smsService.sendReservationSuccessSms(reservation.getUser().getTel(),
-                        "《" + bookName.substring(0, Math.min(bookName.length(), 10)) + "》",
-                        new java.sql.Date(reservation.getSubmitTime().getTime()).toString(),
-                        reservation.getUser().getGrade().getMaxReserveTime(),
-                        reservation.getLastDate().toString());
-                mailService.sendReserveSuccessMail(reservation);
-            }
+//            var reservationList=reservationRepository.findByBookInfo_IsbnAndBookIsNullAndCompleteIsFalseOrderBySubmitTime(holding.getBook().getIsbn());
+//            if (!reservationList.isEmpty()){
+//                var reservation = reservationList.get(0);
+//                holding.setStatus(BookStatusEnum.RESERVED);
+//                reservation.setBook(holding);
+//                reservation.setStatus(ReserveStatusEnum.RESERVED);
+//                reservation.setLastDate(new java.sql.Date((long) (reservation.getUser().getGrade().getMaxReserveTime())
+//                        * 24 * 3600 * 1000 + new Date().getTime()));
+//                holdingRepository.save(holding);
+//                reservationRepository.save(reservation);
+//                // 被预定，发邮件/短信通知预定者
+//                String bookName = reservation.getBookInfo().getName();
+//                smsService.sendReservationSuccessSms(reservation.getUser().getTel(),
+//                        "《" + bookName.substring(0, Math.min(bookName.length(), 10)) + "》",
+//                        new java.sql.Date(reservation.getSubmitTime().getTime()).toString(),
+//                        reservation.getUser().getGrade().getMaxReserveTime(),
+//                        reservation.getLastDate().toString());
+//                mailService.sendReserveSuccessMail(reservation);
+//            }
+            judgeBookStatus(holding);
         }
     }
 
@@ -205,5 +206,28 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
     public Integer delayLastReturnDateForVacation(Date startTime, Date endTime) {
         return borrowRecordMapper.vocationRenewal(new java.sql.Date(startTime.getTime() - 3*24*3600*1000),
                 new java.sql.Date(endTime.getTime() + 3*24*3600*1000));
+    }
+
+    @Override
+    public void judgeBookStatus(Holding holding) {
+        var reservationList=reservationRepository.findByBookInfo_IsbnAndBookIsNullAndCompleteIsFalseOrderBySubmitTime(holding.getBook().getIsbn());
+        if (!reservationList.isEmpty()){
+            var reservation = reservationList.get(0);
+            holding.setStatus(BookStatusEnum.RESERVED);
+            reservation.setBook(holding);
+            reservation.setStatus(ReserveStatusEnum.RESERVED);
+            reservation.setLastDate(new java.sql.Date((long) (reservation.getUser().getGrade().getMaxReserveTime())
+                    * 24 * 3600 * 1000 + new Date().getTime()));
+            holdingRepository.save(holding);
+            reservationRepository.save(reservation);
+            // 被预定，发邮件/短信通知预定者
+            String bookName = reservation.getBookInfo().getName();
+            smsService.sendReservationSuccessSms(reservation.getUser().getTel(),
+                    "《" + bookName.substring(0, Math.min(bookName.length(), 10)) + "》",
+                    new java.sql.Date(reservation.getSubmitTime().getTime()).toString(),
+                    reservation.getUser().getGrade().getMaxReserveTime(),
+                    reservation.getLastDate().toString());
+            mailService.sendReserveSuccessMail(reservation);
+        }
     }
 }

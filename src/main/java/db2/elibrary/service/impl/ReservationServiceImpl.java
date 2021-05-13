@@ -6,6 +6,7 @@ import db2.elibrary.entity.enums.ReserveStatusEnum;
 import db2.elibrary.exception.AuthException;
 import db2.elibrary.exception.NotFoundException;
 import db2.elibrary.repository.*;
+import db2.elibrary.service.BorrowRecordService;
 import db2.elibrary.service.MailService;
 import db2.elibrary.service.ReservationService;
 import db2.elibrary.service.SmsService;
@@ -29,9 +30,10 @@ public class ReservationServiceImpl implements ReservationService {
     private final HoldingRepository holdingRepository;
     private final MailService mailService;
     private final SmsService smsService;
+    private final BorrowRecordService borrowRecordService;
 
     @Autowired
-    public ReservationServiceImpl(ReservationRepository reservationRepository, UserRepository userRepository, BookRepository bookRepository, BorrowRecordRepository borrowRecordRepository, HoldingRepository holdingRepository, MailService mailService, SmsService smsService) {
+    public ReservationServiceImpl(ReservationRepository reservationRepository, UserRepository userRepository, BookRepository bookRepository, BorrowRecordRepository borrowRecordRepository, HoldingRepository holdingRepository, MailService mailService, SmsService smsService, BorrowRecordService borrowRecordService) {
         this.reservationRepository = reservationRepository;
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
@@ -39,6 +41,7 @@ public class ReservationServiceImpl implements ReservationService {
         this.holdingRepository = holdingRepository;
         this.mailService = mailService;
         this.smsService = smsService;
+        this.borrowRecordService = borrowRecordService;
     }
 
     @Override
@@ -57,7 +60,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public String makeReservation(String isbn) {
-        String res = "预约错误，请检查输入是否有误！";
+        String res;
         String userId = UserUtil.getCurrentUserAccount();
         if (userId == null) {
             throw new AuthException("");
@@ -130,12 +133,13 @@ public class ReservationServiceImpl implements ReservationService {
         }
         reservation.setComplete(true);
         reservation.setStatus(ReserveStatusEnum.CANCELLED);
+        reservationRepository.save(reservation);
         if(reservation.getBook()!=null){
             Holding holding = reservation.getBook();
             holding.setStatus(BookStatusEnum.AVAILABLE);
             holdingRepository.save(holding);
+            borrowRecordService.judgeBookStatus(holding);
         }
-        reservationRepository.save(reservation);
         return true;
     }
 

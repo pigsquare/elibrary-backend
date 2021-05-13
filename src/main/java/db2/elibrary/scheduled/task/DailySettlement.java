@@ -10,6 +10,7 @@ import db2.elibrary.repository.BorrowRecordRepository;
 import db2.elibrary.repository.HoldingRepository;
 import db2.elibrary.repository.ReservationRepository;
 import db2.elibrary.repository.UserRepository;
+import db2.elibrary.service.BorrowRecordService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -30,12 +31,14 @@ public class DailySettlement {
     private final BorrowRecordRepository borrowRecordRepository;
     private final ReservationRepository reservationRepository;
     private final HoldingRepository holdingRepository;
+    private final BorrowRecordService borrowRecordService;
 
-    public DailySettlement(UserRepository userRepository, BorrowRecordRepository borrowRecordRepository, ReservationRepository reservationRepository, HoldingRepository holdingRepository) {
+    public DailySettlement(UserRepository userRepository, BorrowRecordRepository borrowRecordRepository, ReservationRepository reservationRepository, HoldingRepository holdingRepository, BorrowRecordService borrowRecordService) {
         this.userRepository = userRepository;
         this.borrowRecordRepository = borrowRecordRepository;
         this.reservationRepository = reservationRepository;
         this.holdingRepository = holdingRepository;
+        this.borrowRecordService = borrowRecordService;
     }
 
     @Scheduled(cron = "0 5 * * * ?") //上线用 "0 5 0 * * ?"
@@ -63,16 +66,17 @@ public class DailySettlement {
             // 预约不借掉信用
             user.setCredit(Math.max(0, user.getCredit()-2));
             userRepository.save(user);
+            borrowRecordService.judgeBookStatus(holding);
         }
 
-        // 结算已经逾期的图书费用与信用分；标准：0.2元/天/本、1分/天/本
+        // 结算已经逾期的图书费用与信用分；标准：0.25元/天/本、1分/天/本
         // 简单粗暴的版本
         var borrowRecords = borrowRecordRepository.findByLastReturnDateBeforeAndReturnTimeIsNull(new java.sql.Date(System.currentTimeMillis()));
         for(BorrowRecord borrowRecord: borrowRecords){
-            borrowRecord.setLateFee(borrowRecord.getLateFee() + 0.2);
+            borrowRecord.setLateFee(borrowRecord.getLateFee() + 0.25);
             borrowRecordRepository.save(borrowRecord);
             User user = borrowRecord.getUser();
-            user.setBalance(user.getBalance() - 0.2);
+            user.setBalance(user.getBalance() - 0.25);
             user.setCredit(Math.max(0, user.getCredit() - 1));
             userRepository.save(user);
         }
