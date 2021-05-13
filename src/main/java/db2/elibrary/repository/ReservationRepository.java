@@ -26,4 +26,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     List<Reservation> findBySubmitTimeBeforeAndCompleteIsFalseAndStatusEquals(Timestamp timestamp, ReserveStatusEnum reserveStatusEnum);
     // 获取已预约到但超期未借的预约记录
     List<Reservation> findByCompleteIsFalseAndStatusEqualsAndLastDateBefore(ReserveStatusEnum reserveStatusEnum, Date date);
+    // 获取个人某本书未完成
+    List<Reservation> findByUserIdAndCompleteIsFalseAndBookInfo_IsbnOrderBySubmitTimeDesc(String userId, String isbn);
 }

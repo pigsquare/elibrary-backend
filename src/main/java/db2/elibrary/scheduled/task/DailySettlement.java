@@ -11,6 +11,7 @@ import db2.elibrary.repository.HoldingRepository;
 import db2.elibrary.repository.ReservationRepository;
 import db2.elibrary.repository.UserRepository;
 import db2.elibrary.service.BorrowRecordService;
+import db2.elibrary.service.ReservationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -31,14 +32,14 @@ public class DailySettlement {
     private final BorrowRecordRepository borrowRecordRepository;
     private final ReservationRepository reservationRepository;
     private final HoldingRepository holdingRepository;
-    private final BorrowRecordService borrowRecordService;
+    private final ReservationService reservationService;
 
-    public DailySettlement(UserRepository userRepository, BorrowRecordRepository borrowRecordRepository, ReservationRepository reservationRepository, HoldingRepository holdingRepository, BorrowRecordService borrowRecordService) {
+    public DailySettlement(UserRepository userRepository, BorrowRecordRepository borrowRecordRepository, ReservationRepository reservationRepository, HoldingRepository holdingRepository, ReservationService reservationService) {
         this.userRepository = userRepository;
         this.borrowRecordRepository = borrowRecordRepository;
         this.reservationRepository = reservationRepository;
         this.holdingRepository = holdingRepository;
-        this.borrowRecordService = borrowRecordService;
+        this.reservationService = reservationService;
     }
 
     @Scheduled(cron = "0 5 * * * ?") //上线用 "0 5 0 * * ?"
@@ -66,7 +67,7 @@ public class DailySettlement {
             // 预约不借掉信用
             user.setCredit(Math.max(0, user.getCredit()-2));
             userRepository.save(user);
-            borrowRecordService.judgeBookStatus(holding);
+            reservationService.judgeBookStatus(holding);
         }
 
         // 结算已经逾期的图书费用与信用分；标准：0.25元/天/本、1分/天/本

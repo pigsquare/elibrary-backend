@@ -30,10 +30,9 @@ public class ReservationServiceImpl implements ReservationService {
     private final HoldingRepository holdingRepository;
     private final MailService mailService;
     private final SmsService smsService;
-    private final BorrowRecordService borrowRecordService;
 
     @Autowired
-    public ReservationServiceImpl(ReservationRepository reservationRepository, UserRepository userRepository, BookRepository bookRepository, BorrowRecordRepository borrowRecordRepository, HoldingRepository holdingRepository, MailService mailService, SmsService smsService, BorrowRecordService borrowRecordService) {
+    public ReservationServiceImpl(ReservationRepository reservationRepository, UserRepository userRepository, BookRepository bookRepository, BorrowRecordRepository borrowRecordRepository, HoldingRepository holdingRepository, MailService mailService, SmsService smsService) {
         this.reservationRepository = reservationRepository;
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
@@ -41,7 +40,6 @@ public class ReservationServiceImpl implements ReservationService {
         this.holdingRepository = holdingRepository;
         this.mailService = mailService;
         this.smsService = smsService;
-        this.borrowRecordService = borrowRecordService;
     }
 
     @Override
@@ -71,6 +69,10 @@ public class ReservationServiceImpl implements ReservationService {
             throw new NotFoundException("用户不存在");
         }
         User user = optionalUser.get();
+        //不能重复预约
+        if (!reservationRepository.findByUserIdAndCompleteIsFalseAndBookInfo_IsbnOrderBySubmitTimeDesc(userId, isbn).isEmpty()){
+            throw new AuthException("不能重复预约");
+        }
         //判断用户已经借出的书目+未完成预约的总数是否大于user.grade.max_holdings
         Integer borrowNum = borrowRecordRepository.countBorrowRecordsByUserAndReturnTimeIsNull(user);
         Integer reservationNum = reservationRepository.findByUserIdAndCompleteIsFalseOrderBySubmitTimeDesc(userId).size();
@@ -138,7 +140,7 @@ public class ReservationServiceImpl implements ReservationService {
             Holding holding = reservation.getBook();
             holding.setStatus(BookStatusEnum.AVAILABLE);
             holdingRepository.save(holding);
-            borrowRecordService.judgeBookStatus(holding);
+            judgeBookStatus(holding);
         }
         return true;
     }
@@ -146,5 +148,28 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public List<Holding> getReservedBookInLibrary() {
         return holdingRepository.findByStatus(BookStatusEnum.RESERVED);
+    }
+
+    @Override
+    public void judgeBookStatus(Holding holding) {
+        var reservationList=reservationRepository.findByBookInfo_IsbnAndBookIsNullAndCompleteIsFalseOrderBySubmitTime(holding.getBook().getIsbn());
+        if (!reservationList.isEmpty()){
+            var reservation = reservationList.get(0);
+            holding.setStatus(BookStatusEnum.RESERVED);
+            reservation.setStatus(ReserveStatusEnum.RESERVED);
+            reservation.setBook(holding);
+            reservation.setLastDate(new java.sql.Date((long) (reservation.getUser().getGrade().getMaxReserveTime())
+                    * 24 * 3600 * 1000 + new Date().getTime()));
+            holdingRepository.save(holding);
+            reservationRepository.save(reservation);
+            // 被预定，发邮件/短信通知预定者
+            String bookName = reservation.getBookInfo().getName();
+            smsService.sendReservationSuccessSms(reservation.getUser().getTel(),
+                    "《" + bookName.substring(0, Math.min(bookName.length(), 10)) + "》",
+                    new java.sql.Date(reservation.getSubmitTime().getTime()).toString(),
+                    reservation.getUser().getGrade().getMaxReserveTime(),
+                    reservation.getLastDate().toString());
+            mailService.sendReserveSuccessMail(reservation);
+        }
     }
 }

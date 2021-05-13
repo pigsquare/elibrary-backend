@@ -11,4 +11,5 @@ public interface ReservationService {
     String makeReservation(String isbn);
     Boolean cancelReservation(Integer id);
     List<Holding> getReservedBookInLibrary();
+    void judgeBookStatus(Holding holding);
 }

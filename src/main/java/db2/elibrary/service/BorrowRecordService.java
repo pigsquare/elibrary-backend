@@ -21,6 +21,6 @@ public interface BorrowRecordService {
     List<BorrowRecord> getBorrowingListByCardNo(String cardNo);
     //根据假期起止日期延长还书时间
     Integer delayLastReturnDateForVacation(Date startTime, Date endTime);
-    //检索图书是否被预约
-    void judgeBookStatus(Holding holding);
+    //检索图书是否被预约(已移动至ReservationService)
+    // void judgeBookStatus(Holding holding);
 }
