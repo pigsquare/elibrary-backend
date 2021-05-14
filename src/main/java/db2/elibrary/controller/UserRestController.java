@@ -49,6 +49,10 @@ public class UserRestController {
         }
         return responseDto;
     }
+
+    // 挂失借书卡
+    // @PatchMapping("/current-user/card")
+
     // 获取当前用户信息
     @GetMapping("/current-user")
     public UserProfileResponseDto getProfile() {
@@ -58,7 +62,7 @@ public class UserRestController {
 
     // 生成并发送验证邮件
     @PostMapping("/validation")
-    public CommonResponseDto submitEmail(@RequestBody MailAddRequestDto requestDto) throws IOException, TemplateException {
+    public CommonResponseDto submitEmail(@RequestBody @Valid MailAddRequestDto requestDto) throws IOException, TemplateException {
         CommonResponseDto responseDto = new CommonResponseDto();
         if (userService.sendMailVerify(requestDto.getEmail())) {
             responseDto.setMessage("验证邮件发送成功，请至邮箱查收！");
@@ -70,6 +74,13 @@ public class UserRestController {
     public CommonResponseDto updateUsername(@PathVariable String username) {
         CommonResponseDto responseDto = new CommonResponseDto();
         responseDto.setArgs(userService.updateUsername(username));
+        return responseDto;
+    }
+    // 更新姓名
+    @PatchMapping("/name/{username}")
+    public CommonResponseDto updateName(@PathVariable String username) {
+        CommonResponseDto responseDto = new CommonResponseDto();
+        responseDto.setArgs(userService.updateName(username));
         return responseDto;
     }
     // 更新用户等级

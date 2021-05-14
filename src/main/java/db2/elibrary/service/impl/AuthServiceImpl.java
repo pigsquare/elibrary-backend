@@ -137,8 +137,8 @@ public class AuthServiceImpl implements AuthService {
                 newUser.setUsername(username);
                 newUser.setName("用户" + username);
                 newUser.setUnencodedPassword(password);
-                // 设置等级1
-                Optional<Grade> gradeOptional = gradeRepository.findById(1);
+                // 设置等级0
+                Optional<Grade> gradeOptional = gradeRepository.findById(0);
                 if(gradeOptional.isEmpty()){
                     throw new NotFoundException("未定义该等级");
                 }

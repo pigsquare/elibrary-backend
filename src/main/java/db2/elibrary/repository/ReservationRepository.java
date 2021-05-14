@@ -19,11 +19,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     // 获取个人预约记录
     List<Reservation> findByUserIdOrderBySubmitTimeDesc(String userId);
     // 获取某书未成功预约holding的预约列表
-    List<Reservation> findByBookInfo_IsbnAndBookIsNullOrderBySubmitTime(String isbn);
+    List<Reservation> findByBookInfo_IsbnAndBookIsNullAndCompleteIsFalseOrderBySubmitTime(String isbn);
     // 获取这个人有没有正在预约某本书
     List<Reservation> findByUserIdAndBookInfo_IsbnAndBookIsNull(String userId, String isbn);
     // 获取超过7天未预约到图书的预约列表
     List<Reservation> findBySubmitTimeBeforeAndCompleteIsFalseAndStatusEquals(Timestamp timestamp, ReserveStatusEnum reserveStatusEnum);
     // 获取已预约到但超期未借的预约记录
     List<Reservation> findByCompleteIsFalseAndStatusEqualsAndLastDateBefore(ReserveStatusEnum reserveStatusEnum, Date date);
+    // 获取个人某本书未完成
+    List<Reservation> findByUserIdAndCompleteIsFalseAndBookInfo_IsbnOrderBySubmitTimeDesc(String userId, String isbn);
 }

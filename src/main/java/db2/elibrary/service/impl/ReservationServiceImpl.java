@@ -6,6 +6,7 @@ import db2.elibrary.entity.enums.ReserveStatusEnum;
 import db2.elibrary.exception.AuthException;
 import db2.elibrary.exception.NotFoundException;
 import db2.elibrary.repository.*;
+import db2.elibrary.service.BorrowRecordService;
 import db2.elibrary.service.MailService;
 import db2.elibrary.service.ReservationService;
 import db2.elibrary.service.SmsService;
@@ -57,7 +58,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public String makeReservation(String isbn) {
-        String res = "预约错误，请检查输入是否有误！";
+        String res;
         String userId = UserUtil.getCurrentUserAccount();
         if (userId == null) {
             throw new AuthException("");
@@ -68,6 +69,10 @@ public class ReservationServiceImpl implements ReservationService {
             throw new NotFoundException("用户不存在");
         }
         User user = optionalUser.get();
+        //不能重复预约
+        if (!reservationRepository.findByUserIdAndCompleteIsFalseAndBookInfo_IsbnOrderBySubmitTimeDesc(userId, isbn).isEmpty()){
+            throw new AuthException("不能重复预约");
+        }
         //判断用户已经借出的书目+未完成预约的总数是否大于user.grade.max_holdings
         Integer borrowNum = borrowRecordRepository.countBorrowRecordsByUserAndReturnTimeIsNull(user);
         Integer reservationNum = reservationRepository.findByUserIdAndCompleteIsFalseOrderBySubmitTimeDesc(userId).size();
@@ -130,17 +135,41 @@ public class ReservationServiceImpl implements ReservationService {
         }
         reservation.setComplete(true);
         reservation.setStatus(ReserveStatusEnum.CANCELLED);
+        reservationRepository.save(reservation);
         if(reservation.getBook()!=null){
             Holding holding = reservation.getBook();
             holding.setStatus(BookStatusEnum.AVAILABLE);
             holdingRepository.save(holding);
+            judgeBookStatus(holding);
         }
-        reservationRepository.save(reservation);
         return true;
     }
 
     @Override
     public List<Holding> getReservedBookInLibrary() {
         return holdingRepository.findByStatus(BookStatusEnum.RESERVED);
+    }
+
+    @Override
+    public void judgeBookStatus(Holding holding) {
+        var reservationList=reservationRepository.findByBookInfo_IsbnAndBookIsNullAndCompleteIsFalseOrderBySubmitTime(holding.getBook().getIsbn());
+        if (!reservationList.isEmpty()){
+            var reservation = reservationList.get(0);
+            holding.setStatus(BookStatusEnum.RESERVED);
+            reservation.setStatus(ReserveStatusEnum.RESERVED);
+            reservation.setBook(holding);
+            reservation.setLastDate(new java.sql.Date((long) (reservation.getUser().getGrade().getMaxReserveTime())
+                    * 24 * 3600 * 1000 + new Date().getTime()));
+            holdingRepository.save(holding);
+            reservationRepository.save(reservation);
+            // 被预定，发邮件/短信通知预定者
+            String bookName = reservation.getBookInfo().getName();
+            smsService.sendReservationSuccessSms(reservation.getUser().getTel(),
+                    "《" + bookName.substring(0, Math.min(bookName.length(), 10)) + "》",
+                    new java.sql.Date(reservation.getSubmitTime().getTime()).toString(),
+                    reservation.getUser().getGrade().getMaxReserveTime(),
+                    reservation.getLastDate().toString());
+            mailService.sendReserveSuccessMail(reservation);
+        }
     }
 }

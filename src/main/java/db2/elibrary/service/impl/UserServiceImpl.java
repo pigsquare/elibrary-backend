@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Boolean sendMailVerify(String mailAddr) throws IOException, TemplateException {
         // 部署地址
-        String tempUrl = "http://localhost:4200/verify/";
+        String tempUrl = "http://localhost:4200/#/verify/";
         String userId = UserUtil.getCurrentUserAccount();
         if(userId == null){
             throw new NotFoundException("");
@@ -90,6 +90,11 @@ public class UserServiceImpl implements UserService {
             return false;
         User user = optionalUser.get();
         user.setCardNo(cardNo);
+        Optional<Grade> gradeOptional = gradeRepository.findById(1);
+        if(gradeOptional.isEmpty()){
+            throw new NotFoundException("未定义该等级");
+        }
+        user.setGrade(gradeOptional.get());
         userRepository.save(user);
         return true;
     }
@@ -134,6 +139,18 @@ public class UserServiceImpl implements UserService {
         }
         User user = userOptional.get();
         user.setUsername(username);
+        userRepository.save(user);
+        return true;
+    }
+
+    @Override
+    public Boolean updateName(String name) {
+        Optional<User> userOptional = userRepository.findById(Objects.requireNonNull(UserUtil.getCurrentUserAccount()));
+        if(userOptional.isEmpty()){
+            throw new NotFoundException("");
+        }
+        User user = userOptional.get();
+        user.setName(name);
         userRepository.save(user);
         return true;
     }
