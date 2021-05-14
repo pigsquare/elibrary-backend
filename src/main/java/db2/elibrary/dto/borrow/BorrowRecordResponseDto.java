@@ -24,12 +24,15 @@ public class BorrowRecordResponseDto {
         this.bookName = borrowRecord.getBook().getBook().getName();
         this.author = borrowRecord.getBook().getBook().getAuthor();
         this.publisher = borrowRecord.getBook().getBook().getPublisher();
-        this.borrowTime = borrowRecord.getBorrowTime().toString().substring(0, 16);
+        this.borrowTime = borrowRecord.getBorrowTime().toString().substring(0, 19);
         this.lastReturnDate = borrowRecord.getLastReturnDate().toString();
         this.extend = borrowRecord.getExtend();
         this.returned = (borrowRecord.getReturnTime() != null);
-        if (this.returned)
-            this.returnTime = borrowRecord.getReturnTime().toString().substring(0, 16);
+        if (this.returned){
+            this.returnTime = borrowRecord.getReturnTime().toString().substring(0, 19);
+        }else {
+            this.returnTime = "待归还";
+        }
         this.lateFee = borrowRecord.getLateFee();
         this.memo = borrowRecord.getMemo();
         this.barcode = borrowRecord.getBook().getBarcode();

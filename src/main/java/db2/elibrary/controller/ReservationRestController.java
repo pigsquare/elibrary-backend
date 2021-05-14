@@ -47,4 +47,7 @@ public class ReservationRestController {
         return holdingInfoResponseDtoList;
     }
 
+    // TODO: 获取用户正在预约的记录
+
+    // TODO: 获取用户所有预约记录
 }
