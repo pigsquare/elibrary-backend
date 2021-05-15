@@ -3,6 +3,7 @@ package db2.elibrary.controller;
 import com.alipay.api.AlipayApiException;
 import db2.elibrary.dto.auth.AddUserTestDto;
 import db2.elibrary.dto.book.IsbnInfoResponseDto;
+import db2.elibrary.entity.Bill;
 import db2.elibrary.entity.User;
 import db2.elibrary.service.AuthService;
 import db2.elibrary.service.HoldingService;
@@ -42,9 +43,9 @@ public class TestRestController{
         return smsService.sendReservationSuccessSms("","《计算机体系结构》","3月28日",7,"4月10日");
     }
     @RequestMapping("/alipay/{barcode}")
-    public String testAlipay(@PathVariable String barcode, @RequestParam String fee) throws AlipayApiException {
+    public Bill testAlipay(@PathVariable String barcode, @RequestParam String fee) throws AlipayApiException {
         AliPayUtil aliPayUtil = new AliPayUtil();
-        String  res = "";
+        Bill  res = new Bill();
         Double p = Double.parseDouble(fee);
         try {
             res = aliPayUtil.payFee(p,barcode,"test");

@@ -12,11 +12,16 @@ import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.response.AlipayTradeCancelResponse;
 import com.alipay.api.response.AlipayTradePayResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
+import db2.elibrary.entity.Bill;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import java.sql.Timestamp;
 
 @Slf4j
+@Component
 public class AliPayUtil{
-    public String  payFee(Double fee, String barCode, String subject) throws AlipayApiException {
+    public Bill payFee(Double fee, String barCode, String subject) throws AlipayApiException {
         AlipayClient alipayClient = new DefaultAlipayClient(
                 "https://openapi.alipaydev.com/gateway.do",
                 "2021000119644643",
@@ -41,6 +46,7 @@ public class AliPayUtil{
         model.setTimeoutExpress("1m");
 
         AlipayTradePayResponse response = null;
+        Bill bill = new Bill();
         try {
             response = alipayClient.execute(request);
             System.out.println(response.getBody());
@@ -75,11 +81,20 @@ public class AliPayUtil{
 
             }
             System.out.println(response.getTradeNo());
-            if(resultCode.equals("10000"))
-                return response.getTradeNo();
+            if(resultCode.equals("10000")){
+                bill.setAmount(Double.parseDouble(response.getTotalAmount()));
+                bill.setCode(resultCode);
+                bill.setOutTradeNo(response.getOutTradeNo());
+                bill.setTradeNo(response.getTradeNo());
+                bill.setMsg(subject);
+                bill.setPayStatus("PAY SUCCESS: " + response.getBuyerLogonId());
+                bill.setPayTime(new Timestamp(System.currentTimeMillis()));
+                return bill;
+            }
+
         } catch (AlipayApiException | InterruptedException e) {
             e.printStackTrace();
         }
-        return null;
+        return bill;
     }
 }

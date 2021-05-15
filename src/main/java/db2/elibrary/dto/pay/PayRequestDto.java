@@ -12,6 +12,6 @@ public class PayRequestDto {
     private String barcode;
     @NotNull
     @NotBlank
-    private String tel;
+    private String cardNo;
     private Double total;
 }

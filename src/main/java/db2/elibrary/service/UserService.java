@@ -20,7 +20,7 @@ public interface UserService {
 //    Boolean prepay(Double amount);
     List<User> getAll();
     Boolean UpdateCardNo(String tel,String cardNo);
-    Double getBalance(String tel) throws NotFoundException;
+    Double getBalance(String cardNo) throws NotFoundException;
     User getUserByCardNo(String cardNo);
     Boolean updateUsername(String username);
     Boolean updateName(String name);
