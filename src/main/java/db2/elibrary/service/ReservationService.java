@@ -10,6 +10,6 @@ public interface ReservationService {
     void saveReservation(Reservation reservation);
     String makeReservation(String isbn);
     Boolean cancelReservation(Integer id);
-    List<Holding> getReservedBookInLibrary();
+    List<Reservation> getReservedBookInLibrary();
     void judgeBookStatus(Holding holding);
 }

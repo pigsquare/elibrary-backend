@@ -146,8 +146,8 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public List<Holding> getReservedBookInLibrary() {
-        return holdingRepository.findByStatus(BookStatusEnum.RESERVED);
+    public List<Reservation> getReservedBookInLibrary() {
+        return reservationRepository.findByStatusAndCompleteIsFalse(ReserveStatusEnum.RESERVED);
     }
 
     @Override
