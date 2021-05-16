@@ -12,4 +12,7 @@ public interface ReservationService {
     Boolean cancelReservation(Integer id);
     List<Reservation> getReservedBookInLibrary();
     void judgeBookStatus(Holding holding);
+    List<Reservation> getUserUncompletedReservation();
+    List<Reservation> getUserReservation();
+
 }

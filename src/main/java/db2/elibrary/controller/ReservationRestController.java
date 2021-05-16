@@ -3,6 +3,7 @@ package db2.elibrary.controller;
 import db2.elibrary.dto.CommonResponseDto;
 import db2.elibrary.dto.holding.HoldingInfoResponseDto;
 import db2.elibrary.dto.reservation.LibraryReservationResponseDto;
+import db2.elibrary.dto.reservation.PersonalReservationResponseDto;
 import db2.elibrary.entity.Holding;
 import db2.elibrary.entity.Reservation;
 import db2.elibrary.service.ReservationService;
@@ -37,7 +38,6 @@ public class ReservationRestController {
         return responseDto;
     }
 
-    // TODO: 返回详细信息，包括用户、图书、条码
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     @GetMapping("/reserved-holdings")
     public List<LibraryReservationResponseDto> getReservedBookInLibrary(){
@@ -49,7 +49,24 @@ public class ReservationRestController {
         return libraryReservationResponseDtoList;
     }
 
-    // TODO: 获取用户正在预约的记录
 
-    // TODO: 获取用户所有预约记录
+    @GetMapping("/user/reserved")
+    public List<PersonalReservationResponseDto> getUserUncompletedReservation(){
+        List<PersonalReservationResponseDto> personalReservationResponseDtoList = new ArrayList<>();
+        List<Reservation> reservationList = reservationService.getUserUncompletedReservation();
+        for(Reservation reservation:reservationList){
+            personalReservationResponseDtoList.add(new PersonalReservationResponseDto(reservation));
+        }
+        return personalReservationResponseDtoList;
+    }
+
+    @GetMapping("/user/all")
+    public List<PersonalReservationResponseDto> getUserReservation(){
+        List<PersonalReservationResponseDto> personalReservationResponseDtoList = new ArrayList<>();
+        List<Reservation> reservationList = reservationService.getUserReservation();
+        for(Reservation reservation:reservationList){
+            personalReservationResponseDtoList.add(new PersonalReservationResponseDto(reservation));
+        }
+        return personalReservationResponseDtoList;
+    }
 }
