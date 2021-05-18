@@ -100,13 +100,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Double getBalance(String cardNo) throws NotFoundException{
+    public User getBalance(String cardNo){
         Optional<User> optionalUser = userRepository.findByCardNo(cardNo);
         if(optionalUser.isEmpty()) {
             throw new NotFoundException("该卡号未注册！");
         }
-        User user = optionalUser.get();
-        return user.getBalance();
+        return optionalUser.get();
     }
 
     @Override

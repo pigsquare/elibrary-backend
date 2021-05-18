@@ -45,7 +45,7 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public CommonResponseDto payOwe(PayRequestDto payRequestDto) {
-        Double balance = userService.getBalance(payRequestDto.getCardNo());
+        Double balance = userService.getBalance(payRequestDto.getCardNo()).getBalance();
         User user = userService.getUserByCardNo(payRequestDto.getCardNo());
         CommonResponseDto responseDto = new CommonResponseDto();
         responseDto.setMessage("操作错误");
