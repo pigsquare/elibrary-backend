@@ -131,7 +131,7 @@ public class BillServiceImpl implements BillService {
                         responseDto.setMessage("赔款成功");
                         bill.setUser(user);
                         billRepository.save(bill);
-                        borrowRecord.setBorrowTime(new Timestamp(System.currentTimeMillis()));
+                        borrowRecord.setReturnTime(new Timestamp(System.currentTimeMillis()));
                         borrowRecord.setMemo("丢失赔款￥"+bill.getAmount());
                         borrowRecordRepository.save(borrowRecord);
                         Holding holding = borrowRecord.getBook();
