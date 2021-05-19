@@ -3,6 +3,6 @@
 <mapper namespace="db2.elibrary.mapper.BorrowRecordMapper">
     <update id="vocationRenewal">
         update borrow_record set last_return_date=#{finish}, memo='假期自动续借'
-        where last_return_date between #{start} and #{finish};
+        where return_time is null and last_return_date between #{start} and #{finish};
     </update>
 </mapper>
