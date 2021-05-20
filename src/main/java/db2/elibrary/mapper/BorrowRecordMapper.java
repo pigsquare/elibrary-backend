@@ -11,5 +11,5 @@ import java.util.List;
 @Mapper
 public interface BorrowRecordMapper {
     Integer vocationRenewal(Date start, Date finish);
-    List<BorrowRecord> getAboutDueBorrowingList();
+    List<Integer> getAboutDueBorrowingList();
 }

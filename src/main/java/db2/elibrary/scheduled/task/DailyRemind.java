@@ -31,11 +31,12 @@ public class DailyRemind {
         this.smsService = smsService;
     }
 
-    @Scheduled(cron = "0 41 * * * ?") //上线用 "0 0 10 * * ?"
+    @Scheduled(cron = "0 21 * * * ?") //上线用 "0 0 10 * * ?"
     public void execute(){
         //发送即将逾期提醒（3天内）邮件和短信
         List<BorrowRecord> borrowRecordList = borrowRecordService.getAboutDueBorrowingList();
         for(BorrowRecord borrowRecord:borrowRecordList){
+            log.info(borrowRecord.toString());
             mailService.sendAboutDueMail(borrowRecord);
             smsService.sendAboutDueSms(borrowRecord.getUser().getTel(),"《"+borrowRecord.getBook().getBook().getName().substring(0,10)+"》",borrowRecord.getBorrowTime().toString().substring(0,10),borrowRecord.getLastReturnDate().toString().substring(0,10));
         }
