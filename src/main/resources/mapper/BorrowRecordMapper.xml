@@ -5,4 +5,17 @@
         update borrow_record set last_return_date=#{finish}, memo='假期自动续借'
         where last_return_date between #{start} and #{finish};
     </update>
+
+    <select id="getAboutDueBorrowingList">
+        select *
+        from borrow_record A
+        where datediff(A.last_return_date, current_date()) &lt; 3
+        and A.return_time is null
+        and A.last_return_date >= all (
+        select B.last_return_date
+        from borrow_record B
+        where B.user_id = A.user_id
+        and datediff(B.last_return_date, current_date()) &lt; 3
+        and B.return_time is null);
+    </select>
 </mapper>

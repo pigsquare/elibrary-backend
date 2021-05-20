@@ -208,4 +208,8 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
                 new java.sql.Date(endTime.getTime() + 3*24*3600*1000));
     }
 
+    @Override
+    public List<BorrowRecord> getAboutDueBorrowingList() {
+        return borrowRecordMapper.getAboutDueBorrowingList();
+    }
 }

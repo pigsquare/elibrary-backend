@@ -105,4 +105,25 @@ public class MailServiceImpl implements MailService {
         }
 
     }
+
+    @Override
+    public void sendAboutDueMail(BorrowRecord record) {
+        try{
+            String name = record.getUser().getName();
+            String mail = record.getUser().getEmail();
+            if(mail==null || mail.isEmpty()) return;
+            Map<String, Object> mailModel = new HashMap<>();
+            Calendar date = Calendar.getInstance();
+            String year = String.valueOf(date.get(Calendar.YEAR));
+            mailModel.put("year", year);
+            mailModel.put("name", name);
+            mailModel.put("book_name", record.getBook().getBook().getName());
+            mailModel.put("last_date", record.getLastReturnDate().toString());
+            Template template = freeMarkerConfigurer.getConfiguration().getTemplate("about_due_email.xhtml");
+            String mailText = FreeMarkerTemplateUtils.processTemplateIntoString(template, mailModel);
+            sendHtmlMail(mail,"图书逾期提醒", mailText, mailSender);
+        }catch (Exception e){
+            log.error("邮件发送异常");
+        }
+    }
 }
