@@ -3,6 +3,7 @@ package db2.elibrary.controller;
 import db2.elibrary.dto.CommonResponseDto;
 import db2.elibrary.dto.pay.CompensationRequestDto;
 import db2.elibrary.dto.pay.PayRequestDto;
+import db2.elibrary.dto.user.UserProfileResponseDto;
 import db2.elibrary.service.BillService;
 import db2.elibrary.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class BillController {
     @GetMapping("/balance/{cardNo}")
     public CommonResponseDto getBalance(@PathVariable String cardNo){
         CommonResponseDto commonResponseDto = new CommonResponseDto();
-        commonResponseDto.setArgs(userService.getBalance(cardNo));
+        commonResponseDto.setArgs(new UserProfileResponseDto(userService.getBalance(cardNo)));
         commonResponseDto.setMessage("获取成功");
         return commonResponseDto;
     }

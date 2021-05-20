@@ -45,7 +45,7 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public CommonResponseDto payOwe(PayRequestDto payRequestDto) {
-        Double balance = userService.getBalance(payRequestDto.getCardNo());
+        Double balance = userService.getBalance(payRequestDto.getCardNo()).getBalance();
         User user = userService.getUserByCardNo(payRequestDto.getCardNo());
         CommonResponseDto responseDto = new CommonResponseDto();
         responseDto.setMessage("操作错误");
@@ -131,7 +131,7 @@ public class BillServiceImpl implements BillService {
                         responseDto.setMessage("赔款成功");
                         bill.setUser(user);
                         billRepository.save(bill);
-                        borrowRecord.setBorrowTime(new Timestamp(System.currentTimeMillis()));
+                        borrowRecord.setReturnTime(new Timestamp(System.currentTimeMillis()));
                         borrowRecord.setMemo("丢失赔款￥"+bill.getAmount());
                         borrowRecordRepository.save(borrowRecord);
                         Holding holding = borrowRecord.getBook();
