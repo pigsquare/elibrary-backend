@@ -42,9 +42,9 @@ public class DailySettlement {
         this.reservationService = reservationService;
     }
 
-    @Scheduled(cron = "0 5 * * * ?") //上线用 "0 5 0 * * ?"
+    @Scheduled(cron = "0 0 8 * * ?") //上线用 "0 0 8 * * ?"
     public void execute(){
-        log.info("scheduled task works!");
+        log.info("scheduled task: daily settlement works!");
         // 终止超过7天未预约到图书或者已预约到但超期未借的预约记录
         List<Reservation> reservationList = reservationRepository.findBySubmitTimeBeforeAndCompleteIsFalseAndStatusEquals(new Timestamp(new Date().getTime()-7*24*60*60*1000),ReserveStatusEnum.WAITING);
         for(Reservation reservation: reservationList){

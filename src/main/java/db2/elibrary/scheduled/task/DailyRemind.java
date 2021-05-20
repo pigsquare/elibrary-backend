@@ -25,23 +25,22 @@ public class DailyRemind {
     private final BorrowRecordService borrowRecordService;
     private final SmsService smsService;
 
-    public DailyRemind(MailService mailService, BorrowRecordRepository borrowRecordRepository, BorrowRecordService borrowRecordService, SmsService smsService) {
+    public DailyRemind(MailService mailService, BorrowRecordService borrowRecordService, SmsService smsService) {
         this.mailService = mailService;
         this.borrowRecordService = borrowRecordService;
         this.smsService = smsService;
     }
 
-    @Scheduled(cron = "0 21 * * * ?") //上线用 "0 0 10 * * ?"
+    @Scheduled(cron = "0 0 10 * * ?") //上线用 "0 0 10 * * ?"
     public void execute(){
+        log.info("scheduled task: daily remind works!");
         //发送即将逾期提醒（3天内）邮件和短信
         List<BorrowRecord> borrowRecordList = borrowRecordService.getAboutDueBorrowingList();
         for(BorrowRecord borrowRecord:borrowRecordList){
-            log.info(borrowRecord.toString());
             mailService.sendAboutDueMail(borrowRecord);
             smsService.sendAboutDueSms(borrowRecord.getUser().getTel(),"《"+borrowRecord.getBook().getBook().getName().substring(0,10)+"》",borrowRecord.getBorrowTime().toString().substring(0,10),borrowRecord.getLastReturnDate().toString().substring(0,10));
         }
         //发送图书超期邮件
 
-        log.info("scheduled task works!");
     }
 }
