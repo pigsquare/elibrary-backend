@@ -44,7 +44,7 @@ public class AdminServiceImpl implements AdminService {
         newAdmin.setSalary(salary);
         newAdmin.setTitle(title);
         User user = optionalUser.get();
-        user.setRole(RoleEnum.ROLE_ADMIN);
+        user.setRole(RoleEnum.ROLE_STAFF);
         userRepository.save(user);
         return adminRepository.save(newAdmin);
     }
