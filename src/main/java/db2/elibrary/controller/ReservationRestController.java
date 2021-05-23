@@ -2,7 +2,10 @@ package db2.elibrary.controller;
 
 import db2.elibrary.dto.CommonResponseDto;
 import db2.elibrary.dto.holding.HoldingInfoResponseDto;
+import db2.elibrary.dto.reservation.LibraryReservationResponseDto;
+import db2.elibrary.dto.reservation.PersonalReservationResponseDto;
 import db2.elibrary.entity.Holding;
+import db2.elibrary.entity.Reservation;
 import db2.elibrary.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,16 +38,35 @@ public class ReservationRestController {
         return responseDto;
     }
 
-    // TODO: 返回详细信息，包括用户、图书、条码
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     @GetMapping("/reserved-holdings")
-    public List<HoldingInfoResponseDto> getReservedBookInLibrary(){
-        List<HoldingInfoResponseDto> holdingInfoResponseDtoList = new ArrayList<>();
-        List<Holding> holdingList = reservationService.getReservedBookInLibrary();
-        for(Holding holding:holdingList){
-            holdingInfoResponseDtoList.add(new HoldingInfoResponseDto(holding));
+    public List<LibraryReservationResponseDto> getReservedBookInLibrary(){
+        List<LibraryReservationResponseDto> libraryReservationResponseDtoList = new ArrayList<>();
+        List<Reservation> reservationList= reservationService.getReservedBookInLibrary();
+        for(Reservation reservation:reservationList){
+            libraryReservationResponseDtoList.add(new LibraryReservationResponseDto(reservation));
         }
-        return holdingInfoResponseDtoList;
+        return libraryReservationResponseDtoList;
     }
 
+
+    @GetMapping("/user/reserved")
+    public List<PersonalReservationResponseDto> getUserUncompletedReservation(){
+        List<PersonalReservationResponseDto> personalReservationResponseDtoList = new ArrayList<>();
+        List<Reservation> reservationList = reservationService.getUserUncompletedReservation();
+        for(Reservation reservation:reservationList){
+            personalReservationResponseDtoList.add(new PersonalReservationResponseDto(reservation));
+        }
+        return personalReservationResponseDtoList;
+    }
+
+    @GetMapping("/user/all")
+    public List<PersonalReservationResponseDto> getUserReservation(){
+        List<PersonalReservationResponseDto> personalReservationResponseDtoList = new ArrayList<>();
+        List<Reservation> reservationList = reservationService.getUserReservation();
+        for(Reservation reservation:reservationList){
+            personalReservationResponseDtoList.add(new PersonalReservationResponseDto(reservation));
+        }
+        return personalReservationResponseDtoList;
+    }
 }

@@ -14,11 +14,9 @@ public class CompensationRequestDto {
     @NotNull
     private String cardInfo;
     @NotNull
-    @NotBlank
-    private String borrowRecordId;
-    @NotNull
-    @NotBlank
-    private Double amount;
+    private Integer borrowRecordId;
+
+    private Double additionalFee;
 
     private Boolean isCompensateBook = false;   // 是否赔书
 }

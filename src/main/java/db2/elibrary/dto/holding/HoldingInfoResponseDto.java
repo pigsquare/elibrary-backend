@@ -14,6 +14,6 @@ public class HoldingInfoResponseDto {
         this.id = holding.getId();
         this.isbn = holding.getBook().getIsbn();
         this.barcode = holding.getBarcode();
-        this.status = holding.getStatus().name();
+        this.status = holding.getStatus().getChineseName();
     }
 }

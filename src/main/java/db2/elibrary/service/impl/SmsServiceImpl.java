@@ -31,7 +31,7 @@ public class SmsServiceImpl implements SmsService {
     }
 
     @Override
-    public String sendOverdueSms(String phone, String bookName, String borrowTime, String dueTime) {
+    public String sendAboutDueSms(String phone, String bookName, String borrowTime, String dueTime) {
         smsUtil.setPhoneNumberSet1(new String[]{phone});
         smsUtil.setTemplateId("912713");
         smsUtil.setTemplateParamSet1(new String[]{borrowTime, bookName, dueTime});

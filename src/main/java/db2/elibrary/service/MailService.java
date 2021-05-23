@@ -10,4 +10,5 @@ public interface MailService {
     void sendHtmlMail(String to, String subject, String content, JavaMailSender mailSender);
     void sendBorrowSuccessMail(BorrowRecord record);
     void sendReserveSuccessMail(Reservation reservation);
+    void sendAboutDueMail(BorrowRecord record);
 }

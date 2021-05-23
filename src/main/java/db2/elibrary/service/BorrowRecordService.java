@@ -23,4 +23,6 @@ public interface BorrowRecordService {
     Integer delayLastReturnDateForVacation(Date startTime, Date endTime);
     //检索图书是否被预约(已移动至ReservationService)
     // void judgeBookStatus(Holding holding);
+    //获取所有将要在三天内到期的预约记录
+    List<BorrowRecord> getAboutDueBorrowingList();
 }

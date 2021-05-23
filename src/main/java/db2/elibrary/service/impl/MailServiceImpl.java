@@ -2,10 +2,8 @@ package db2.elibrary.service.impl;
 
 import db2.elibrary.entity.BorrowRecord;
 import db2.elibrary.entity.Reservation;
-import db2.elibrary.exception.AuthException;
 import db2.elibrary.service.MailService;
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -17,7 +15,6 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -104,5 +101,26 @@ public class MailServiceImpl implements MailService {
             log.error("邮件发送异常");
         }
 
+    }
+
+    @Override
+    public void sendAboutDueMail(BorrowRecord record) {
+        try{
+            Map<String, Object> mailModel = new HashMap<>();
+            String name = record.getUser().getName();
+            String mail = record.getUser().getEmail();
+            if(mail==null || mail.isEmpty()) return;
+            Calendar date = Calendar.getInstance();
+            String year = String.valueOf(date.get(Calendar.YEAR));
+            mailModel.put("book_name", record.getBook().getBook().getName());
+            mailModel.put("last_date", record.getLastReturnDate().toString());
+            mailModel.put("year", year);
+            mailModel.put("name", name);
+            Template template = freeMarkerConfigurer.getConfiguration().getTemplate("about_due_email.xhtml");
+            String mailText = FreeMarkerTemplateUtils.processTemplateIntoString(template, mailModel);
+            sendHtmlMail(mail,"图书逾期提醒", mailText, mailSender);
+        }catch (Exception e){
+            log.error("邮件发送异常");
+        }
     }
 }

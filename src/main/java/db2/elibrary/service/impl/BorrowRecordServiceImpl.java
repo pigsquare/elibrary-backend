@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -208,4 +209,16 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
                 new java.sql.Date(endTime.getTime() + 3*24*3600*1000));
     }
 
+    @Override
+    public List<BorrowRecord> getAboutDueBorrowingList() {
+        List<Integer> recordIdList =  borrowRecordMapper.getAboutDueBorrowingList();
+        List<BorrowRecord> borrowRecordList = new ArrayList<>();
+        for (Integer i:
+             recordIdList) {
+            log.info("id："+ i);
+            var tmp = borrowRecordRepository.findById(i);
+            tmp.ifPresent(borrowRecordList::add);
+        }
+        return borrowRecordList;
+    }
 }

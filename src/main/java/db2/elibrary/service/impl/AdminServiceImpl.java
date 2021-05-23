@@ -3,6 +3,8 @@ package db2.elibrary.service.impl;
 import db2.elibrary.dto.admin.AdminInfoResponseDto;
 import db2.elibrary.entity.Admin;
 import db2.elibrary.entity.User;
+import db2.elibrary.entity.enums.RoleEnum;
+import db2.elibrary.exception.AuthException;
 import db2.elibrary.exception.NotFoundException;
 import db2.elibrary.repository.AdminRepository;
 import db2.elibrary.repository.UserRepository;
@@ -34,10 +36,16 @@ public class AdminServiceImpl implements AdminService {
         if(optionalUser.isEmpty()){
             throw new NotFoundException("");
         }
+        if(adminRepository.findByUser_Tel(tel).isPresent()){
+            throw new AuthException("");
+        }
         Admin newAdmin = new Admin();
         newAdmin.setUser(optionalUser.get());
         newAdmin.setSalary(salary);
         newAdmin.setTitle(title);
+        User user = optionalUser.get();
+        user.setRole(RoleEnum.ROLE_STAFF);
+        userRepository.save(user);
         return adminRepository.save(newAdmin);
     }
 
