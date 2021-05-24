@@ -76,7 +76,7 @@ public class ReservationServiceImpl implements ReservationService {
         //判断用户已经借出的书目+未完成预约的总数是否大于user.grade.max_holdings
         Integer borrowNum = borrowRecordRepository.countBorrowRecordsByUserAndReturnTimeIsNull(user);
         Integer reservationNum = reservationRepository.findByUserIdAndCompleteIsFalseOrderBySubmitTimeDesc(userId).size();
-        if (borrowNum + reservationNum > user.getGrade().getMaxHoldings()) {
+        if (borrowNum + reservationNum >= user.getGrade().getMaxHoldings()) {
             throw new AuthException("超过最大借书和预约数量");
         }
         // 书是否存在

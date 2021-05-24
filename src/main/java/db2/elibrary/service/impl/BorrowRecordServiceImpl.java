@@ -118,7 +118,7 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         }
         BorrowRecord borrowRecord = borrowRecordList.get(0);
         User user = borrowRecord.getUser();
-        if (borrowRecord.getLastReturnDate().compareTo(new Date()) > 0) {
+        if (borrowRecord.getLastReturnDate().compareTo(new Date()) < 0) {
             // user.setBalance(user.getBalance() - borrowRecord.getLateFee());
             // 如果超时归还，不加信用分
             user.setCredit(user.getCredit() - 5);
